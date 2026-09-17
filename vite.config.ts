@@ -1,0 +1,69 @@
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+import { defineConfig } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
+
+export default defineConfig(() => {
+  const base = process.env.BASE_PATH || (process.env.GITHUB_ACTIONS ? '/smeta/' : '/');
+
+  return {
+    base,
+    plugins: [
+      react(),
+      tailwindcss(),
+      VitePWA({
+        registerType: 'autoUpdate',
+        includeAssets: [
+          'favicon.png',
+          'favicon-16.png',
+          'favicon-32.png',
+          'apple-touch-icon.png',
+          'icon.svg',
+          'pwa-192x192.png',
+          'pwa-512x512.png',
+          'pwa-maskable-512x512.png',
+        ],
+        manifest: {
+          id: base,
+          name: 'СметаПро — Строительные сметы',
+          short_name: 'СметаПро',
+          description: 'Профессиональное PWA-приложение для составления строительных смет с каталогом работ и материалов, расчетом скидок и экспортом.',
+          lang: 'ru',
+          dir: 'ltr',
+          theme_color: '#0f172a',
+          background_color: '#0f172a',
+          display: 'standalone',
+          start_url: base,
+          scope: base,
+          icons: [
+            { src: `${base}pwa-192x192.png`, sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: `${base}pwa-512x512.png`, sizes: '512x512', type: 'image/png', purpose: 'any' },
+            { src: `${base}pwa-maskable-512x512.png`, sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          ],
+        },
+        workbox: {
+          cleanupOutdatedCaches: true,
+          clientsClaim: true,
+          skipWaiting: true,
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+          runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/raw\.githubusercontent\.com\/getto-dev\/check-data\/main\/.*\.json$/i,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'smeta-remote-data-v4',
+                networkTimeoutSeconds: 3,
+                expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+                cacheableResponse: { statuses: [0, 200] },
+              },
+            },
+          ],
+        },
+        devOptions: { enabled: true, type: 'module' },
+      }),
+    ],
+    resolve: { alias: { '@': path.resolve(__dirname, '.') } },
+    server: { hmr: process.env.DISABLE_HMR !== 'true', watch: process.env.DISABLE_HMR === 'true' ? null : {} },
+  };
+});

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1ea7ff"/>
+      <stop offset="0.52" stop-color="#0877f5"/>
+      <stop offset="1" stop-color="#0c3fd1"/>
+    </linearGradient>
+    <linearGradient id="white" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.72" stop-color="#f7fbff"/>
+      <stop offset="1" stop-color="#d7e9ff"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#18e3b1"/>
+      <stop offset="1" stop-color="#06ad91"/>
+    </linearGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="160%">
+      <feDropShadow dx="0" dy="22" stdDeviation="18" flood-color="#04359e" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+
+  <rect x="10" y="10" width="1004" height="1004" rx="220" fill="url(#bg)"/>
+
+  <g filter="url(#shadow)">
+    <path d="M126 430 L504 114 L892 432" fill="none" stroke="url(#white)" stroke-width="66" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M204 421 V774 Q204 826 256 826 H663" fill="none" stroke="url(#white)" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M774 303 V409" fill="none" stroke="url(#white)" stroke-width="62" stroke-linecap="round"/>
+
+    <rect x="327" y="391" width="96" height="96" rx="20" fill="#7fd8ff"/>
+    <rect x="461" y="391" width="96" height="96" rx="20" fill="#5ec6ff"/>
+    <rect x="327" y="517" width="96" height="96" rx="20" fill="#64caff"/>
+    <rect x="461" y="517" width="96" height="96" rx="20" fill="#42baff"/>
+
+    <g transform="rotate(7 773 716)">
+      <rect x="570" y="468" width="378" height="486" rx="62" fill="url(#white)"/>
+      <rect x="624" y="521" width="270" height="105" rx="26" fill="url(#screen)"/>
+
+      <rect x="624" y="671" width="112" height="92" rx="25" fill="#143f99"/>
+      <rect x="758" y="671" width="112" height="92" rx="25" fill="#143f99"/>
+      <rect x="624" y="784" width="112" height="92" rx="25" fill="#143989"/>
+      <rect x="758" y="784" width="112" height="92" rx="25" fill="#143989"/>
+
+      <path d="M680 692 V742 M655 717 H705" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+      <path d="M795 717 H835" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+      <path d="M660 812 L700 852 M700 812 L660 852" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+      <path d="M793 823 H833 M793 844 H833" stroke="#fff" stroke-width="15" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>
