@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate remote catalog data
+        run: npm run validate:remote-data
+
+      - name: Typecheck
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          BASE_PATH: /smeta/
+
+      - name: Verify build has no legacy Pages path
+        run: |
+          legacy_slug='checknew'
+          legacy_pages_path="/${legacy_slug}/"
+          legacy_pages_url="https://getto-dev.github.io/${legacy_slug}"
+          legacy_repo_url="https://github.com/getto-dev/${legacy_slug}"
+          if git grep -n -e "$legacy_pages_path" -e "$legacy_pages_url" -e "$legacy_repo_url"; then
+            echo 'Found legacy project Pages/repository path references.'
+            exit 1
+          fi
+          grep -q '/smeta/' dist/manifest.webmanifest
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: npm run e2e

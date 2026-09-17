@@ -1,0 +1,113 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+env:
+  BASE_PATH: /smeta/
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate remote catalog data
+        run: npm run validate:remote-data
+
+      - name: Typecheck
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build Vite App
+        run: npm run build
+
+      - name: Verify Pages output
+        run: |
+          test -s dist/index.html
+          test -f dist/manifest.webmanifest
+          grep -q '/smeta/' dist/manifest.webmanifest
+          test -f dist/pwa-192x192.png
+          test -f dist/pwa-512x512.png
+          test -f dist/pwa-maskable-512x512.png
+          test ! -e dist/data/profiles.json
+          test ! -e dist/data/profiles/plumbing/catalog.json
+          test ! -e dist/data/profiles/electrical/catalog.json
+          test ! -e dist/data/profiles/finishing/catalog.json
+          test ! -e dist/data/profiles/construction/catalog.json
+
+      - name: Verify repository has no legacy Pages path
+        run: |
+          legacy_slug='checknew'
+          legacy_pages_path="/${legacy_slug}/"
+          legacy_pages_url="https://getto-dev.github.io/${legacy_slug}"
+          legacy_repo_url="https://github.com/getto-dev/${legacy_slug}"
+          if git grep -n -e "$legacy_pages_path" -e "$legacy_pages_url" -e "$legacy_repo_url"; then
+            echo 'Found legacy project Pages/repository path references.'
+            exit 1
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+  e2e:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application for E2E
+        run: npm run build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: npm run e2e
+
+  deploy:
+    needs: [build, e2e]
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
