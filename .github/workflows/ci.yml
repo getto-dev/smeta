@@ -47,6 +47,11 @@ jobs:
             exit 1
           fi
           grep -q '/smeta/' dist/manifest.webmanifest
+          if grep -R -n -e 'check-data' -e 'checknew' dist; then
+            echo 'Found legacy project/data-source references in build output.'
+            exit 1
+          fi
+          grep -q 'smeta-remote-data-v5' dist/sw.js
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
