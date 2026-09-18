@@ -92,7 +92,7 @@ function parseEstimate(value: unknown): Estimate {
   return estimate;
 }
 
-/** Imports only the current canonical checknew estimate format. */
+/** Imports only the current canonical СметаПро estimate format. */
 export async function importFromFile(file: File): Promise<Estimate> {
   const text = await file.text();
   const lowerName = file.name.toLowerCase();
