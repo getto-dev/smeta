@@ -41,7 +41,7 @@ export function getEstimateNumber(estimate: Estimate): string {
 function parseEstimate(value: unknown): Estimate {
   if (!value || typeof value !== 'object') throw new Error('Некорректная структура файла сметы.');
   const raw = value as Partial<Estimate>;
-  if (raw.schemaVersion !== ESTIMATE_SCHEMA_VERSION) throw new Error(`Неподдерживаемая версия сметы: ${String(raw.schemaVersion ?? 'не указана')}.`);
+  if (raw.schemaVersion !== ESTIMATE_SCHEMA_VERSION) throw new Error(`Неподдерживаемая версия СметаПро: ${String(raw.schemaVersion ?? 'не указана')}.`);
   if (!Array.isArray(raw.items) || raw.items.length > MAX_ESTIMATE_ITEMS) throw new Error('Файл содержит некорректный список позиций сметы.');
   const now = Date.now();
   const items: EstimateItem[] = raw.items.map((value, index) => {
@@ -101,15 +101,15 @@ export async function importFromFile(file: File): Promise<Estimate> {
     try { return parseEstimate(JSON.parse(text)); }
     catch (error) {
       if (error instanceof Error && error.message.includes('Неподдерживаемая версия сметы')) throw error;
-      throw new Error('Файл не является корректной сметой checknew.');
+      throw new Error('Файл не является корректной сметой СметаПро.');
     }
   }
   const match = text.match(/<script[^>]*id=["']smeta-app-data["'][^>]*>([\s\S]*?)<\/script>/i);
-  if (!match?.[1]) throw new Error('В HTML файле не найдены данные сметы checknew.');
+  if (!match?.[1]) throw new Error('В HTML файле не найдены данные сметы СметаПро.');
   try { return parseEstimate(JSON.parse(match[1])); }
   catch (error) {
     if (error instanceof Error && error.message.includes('Неподдерживаемая версия сметы')) throw error;
-    throw new Error('Не удалось прочитать данные сметы из HTML файла.');
+    throw new Error('Не удалось прочитать данные сметы из HTML-файла СметаПро.');
   }
 }
 
