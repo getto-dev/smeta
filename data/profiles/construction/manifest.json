@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "construction",
+  "name": "Строительство",
+  "description": "Фундаменты, кладка стен, кровля, фасадные работы и общестроительные материалы",
+  "icon": "Hammer",
+  "color": "orange",
+  "version": "1.0.0",
+  "locale": "ru-RU",
+  "currency": "RUB",
+  "files": {
+    "catalog": "catalog.json",
+    "categories": "categories.json",
+    "config": "config.json"
+  },
+  "itemCount": 12
+}
