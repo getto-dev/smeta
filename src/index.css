@@ -2,15 +2,14 @@
 
 @layer base {
   body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
-  
+
   .font-mono {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   }
 }
 
-/* Custom smooth scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -26,7 +25,6 @@
   background: #475569;
 }
 
-/* Avoid laying out/painting off-screen catalog rows eagerly on large catalogs. */
 @supports (content-visibility: auto) {
   div[class~="shadow-xl"][class~="bg-slate-900"][class~="rounded-2xl"] > div[class*="overflow-y-auto"][class*="min-h-[300px]"] > * {
     content-visibility: auto;
@@ -34,7 +32,6 @@
   }
 }
 
-/* Print stylesheets for clean PDF export */
 @media print {
   body {
     background: #ffffff !important;
@@ -65,4 +62,3 @@
     size: auto;
   }
 }
-
