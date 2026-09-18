@@ -122,7 +122,7 @@ export function validateProfileCatalog(data: unknown): ProfileCatalog {
     if (item.code !== undefined && (typeof item.code !== 'string' || item.code.length > MAX_ITEM_CODE_LENGTH)) {
       throw new Error('Позиция ' + itemId + ' имеет неверный код');
     }
-    if (item.type !== undefined && item.type !== 'work' && item.type !== 'material') {
+    if (rawType !== undefined && rawType !== 'work' && rawType !== 'material' && rawType !== 'service') {
       throw new Error('Позиция ' + itemId + ' имеет неверный type');
     }
 
@@ -134,7 +134,7 @@ export function validateProfileCatalog(data: unknown): ProfileCatalog {
       categoryId,
       unit,
       price,
-      type: item.type === 'material' ? 'material' : 'work',
+      type: rawType === 'material' ? 'material' : 'work',
       description: typeof item.description === 'string' ? item.description : undefined,
       code: typeof item.code === 'string' ? item.code : undefined,
     });
