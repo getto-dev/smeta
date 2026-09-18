@@ -2,6 +2,7 @@ import { PDFDocument, rgb, PDFFont } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import { Estimate, EstimateItem } from '../types';
 import { formatCurrency } from './exportService';
+import { calculateEstimateTotals, calculateLineTotal } from '../domain/estimate/calculations';
 import { formatQuantity } from '../utils/quantity';
 
 // Constants strictly aligned with getto-dev/check
@@ -159,12 +160,12 @@ export async function generateAndDownloadVectorPDF(estimate: Estimate): Promise<
   const services = estimate.items.filter((item) => item.type === 'work' || !item.type);
   const products = estimate.items.filter((item) => item.type === 'material');
 
-  const servicesSum = services.reduce((sum, item) => sum + Math.round(item.price * item.quantity), 0);
-  const productsSum = products.reduce((sum, item) => sum + Math.round(item.price * item.quantity), 0);
-
-  const discountPercent = Math.max(0, Math.min(100, Number(estimate.discount) || 0));
-  const discountAmount = Math.round((servicesSum * discountPercent) / 100);
-  const grandTotal = Math.max(0, servicesSum - discountAmount + productsSum);
+  const totals = calculateEstimateTotals(estimate.items, estimate.discount);
+  const servicesSum = totals.servicesSum;
+  const productsSum = totals.productsSum;
+  const discountPercent = totals.discountPercent;
+  const discountAmount = totals.discountAmount;
+  const grandTotal = totals.grandTotal;
 
   const sections = [
     { type: 'service', title: 'Наименование работ и услуг', items: services },
@@ -235,7 +236,7 @@ export async function generateAndDownloadVectorPDF(estimate: Estimate): Promise<
 
       const qty = `${formatQuantity(item.quantity)} ${item.unit}`;
       const price = money(item.price);
-      const total = money(Math.round(item.price * item.quantity));
+      const total = money(calculateLineTotal(item.price, item.quantity));
       const valueY = y - 1 - (rowHeight - 8) / 2 + 3;
 
       text(qty, centeredTextX(font, qty, TEXT_SIZES.values, QTY_LEFT, QTY_RIGHT), valueY, TEXT_SIZES.values, TEXT);
