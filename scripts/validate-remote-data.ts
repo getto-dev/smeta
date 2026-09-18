@@ -4,6 +4,7 @@ import {
   validateRemoteIndex,
   validateRemoteManifest,
   validateRemoteSynonyms,
+  validateRemoteConfig,
 } from '../src/services/catalogValidation.ts';
 
 const BASE = 'https://raw.githubusercontent.com/getto-dev/smeta/main/data/';
@@ -37,6 +38,10 @@ const main = async () => {
 
     if (manifest.files.synonyms) {
       validateRemoteSynonyms(await fetchJson(base + manifest.files.synonyms), profile.id);
+    }
+
+    if (manifest.files.config) {
+      validateRemoteConfig(await fetchJson(base + manifest.files.config), profile.id);
     }
 
     console.log('✓ ' + profile.id + ': ' + catalog.items.length + ' remote items');
