@@ -1,6 +1,5 @@
 import type { ProfileCatalog, ProfileMeta } from '../types';
 import {
-  MAX_CATALOG_ITEMS,
   REMOTE_DATA_BASE_URL,
   validateRemoteCategories,
   validateRemoteDataset,
