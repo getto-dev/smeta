@@ -84,9 +84,11 @@ export function validateProfileCatalog(data: unknown): ProfileCatalog {
     throw new Error('Каталог содержит некорректный список позиций');
   }
 
-  const categories = Array.isArray(catalog.categories)
-    ? catalog.categories.map((category) => typeof category === 'string' ? category.trim() : '').filter(Boolean)
-    : [];
+  if (!Array.isArray(catalog.categories)) throw new Error('Каталог не содержит корректный список категорий');
+  const categories = catalog.categories.map((category) => typeof category === 'string' ? category.trim() : '');
+  if (categories.some((category) => !category || category.length > MAX_CATEGORY)) {
+    throw new Error('Каталог содержит некорректную категорию');
+  }
   const categoryNames = new Set(categories);
   const validItems: CatalogItem[] = [];
   const seenIds = new Set<string>();
