@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/getto-dev/smeta/main/data/schema/manifest.schema.json",
+  "title": "SmetaPro profile manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "name",
+    "description",
+    "icon",
+    "color",
+    "version",
+    "locale",
+    "currency",
+    "files"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_-]{1,64}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "icon": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "color": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "locale": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 50
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "catalog",
+        "categories"
+      ],
+      "properties": {
+        "catalog": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+\\.json$"
+        },
+        "categories": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+\\.json$"
+        },
+        "synonyms": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+\\.json$"
+        },
+        "config": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+\\.json$"
+        }
+      }
+    },
+    "itemCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100000
+    }
+  }
+}

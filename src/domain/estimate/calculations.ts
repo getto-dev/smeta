@@ -19,7 +19,7 @@ export function calculateLineTotal(priceKopecks: number, quantity: number): numb
   return Number.isSafeInteger(total) && total >= 0 ? total : 0;
 }
 
-/** Calculates all estimate totals from canonical price + quantity values. */
+/** Calculates totals from canonical price + quantity values; the discount applies to works only. */
 export function calculateEstimateTotals(items: EstimateItem[], discountPercent: number): EstimateTotals {
   let servicesSum = 0;
   let productsSum = 0;

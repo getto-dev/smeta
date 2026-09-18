@@ -10,7 +10,6 @@ interface EstimateTableProps {
   /** Receives the unit price in kopecks. */
   onUpdatePrice: (id: string, priceKopecks: number) => void;
   onDeleteItem: (id: string) => void;
-  onClearAll: () => void;
   onSwitchToCatalog?: () => void;
 }
 
@@ -19,7 +18,6 @@ export const EstimateTable: React.FC<EstimateTableProps> = ({
   onUpdateQuantity,
   onUpdatePrice,
   onDeleteItem,
-  onClearAll,
   onSwitchToCatalog,
 }) => {
   const [editingPriceId, setEditingPriceId] = useState<string | null>(null);

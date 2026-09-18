@@ -12,11 +12,12 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "lint": "npm run typecheck",
     "test": "tsx --test \"src/**/*.test.ts\"",
     "e2e": "playwright test",
-    "validate:remote-data": "node scripts/validate-remote-data.mjs",
-    "validate:data": "node scripts/validate-data.mjs"
+    "validate:remote-data": "tsx scripts/validate-remote-data.ts",
+    "validate:data": "tsx scripts/validate-data.ts"
   },
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",

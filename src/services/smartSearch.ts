@@ -132,7 +132,6 @@ export const buildSynonymIndex = (additionalGroups?: string[][]) => {
   return { tokenToConcepts, concepts };
 };
 
-const GLOBAL_SYNONYM_INDEX = buildSynonymIndex();
 
 interface SearchDocument {
   nameTokens: string[];
@@ -217,7 +216,7 @@ export const searchCatalogItems = (
   customSynonyms?: string[][]
 ): CatalogItem[] => {
   const trimmed = query.trim();
-  const synonymIndex = customSynonyms ? buildSynonymIndex(customSynonyms) : GLOBAL_SYNONYM_INDEX;
+  const synonymIndex = buildSynonymIndex(customSynonyms);
   const filteredByCategory = selectedCategory ? catalog.filter((it) => it.category === selectedCategory) : catalog;
   if (!trimmed) return filteredByCategory;
   const queryTokens = tokenizeQuery(trimmed);

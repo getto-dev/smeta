@@ -49,10 +49,10 @@ export default defineConfig(() => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
           runtimeCaching: [
             {
-              urlPattern: /^https:\/\/raw\.githubusercontent\.com\/getto-dev\/check-data\/main\/.*\.json$/i,
+              urlPattern: /^https:\/\/raw\.githubusercontent\.com\/getto-dev\/smeta\/main\/data\/.*\.json$/i,
               handler: 'NetworkFirst',
               options: {
-                cacheName: 'smeta-remote-data-v4',
+                cacheName: 'smeta-remote-data-v5',
                 networkTimeoutSeconds: 3,
                 expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
                 cacheableResponse: { statuses: [0, 200] },

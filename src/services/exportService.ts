@@ -1,6 +1,9 @@
 import { Estimate, EstimateItem, ESTIMATE_SCHEMA_VERSION } from '../types';
 import { calculateEstimateTotals, calculateLineTotal } from '../domain/estimate/calculations';
 import { formatQuantity } from '../utils/quantity';
+import { getEstimateNumber } from '../domain/estimate/number';
+
+export { getEstimateNumber };
 import { isValidEstimate, MAX_ESTIMATE_ITEMS } from '../utils/validation';
 
 /** Loads the heavy PDF exporter only when a PDF is actually requested. */
@@ -29,19 +32,10 @@ export function formatDate(dateString: string): string {
 
 function money(kopecks: number): string { return formatCurrency(kopecks).replace(/\u00a0/g, ' '); }
 
-export function getEstimateNumber(estimate: Estimate): string {
-  const d = estimate.date ? new Date(estimate.date) : new Date();
-  const year = isNaN(d.getTime()) ? new Date() : d;
-  const yy = String(year.getFullYear()).slice(-2);
-  const mm = String(year.getMonth() + 1).padStart(2, '0');
-  const dd = String(year.getDate()).padStart(2, '0');
-  return `${yy}${mm}${dd}-01`;
-}
-
 function parseEstimate(value: unknown): Estimate {
   if (!value || typeof value !== 'object') throw new Error('Некорректная структура файла сметы.');
   const raw = value as Partial<Estimate>;
-  if (raw.schemaVersion !== ESTIMATE_SCHEMA_VERSION) throw new Error(`Неподдерживаемая версия сметы: ${String(raw.schemaVersion ?? 'не указана')}.`);
+  if (raw.schemaVersion !== ESTIMATE_SCHEMA_VERSION) throw new Error(`Неподдерживаемая версия СметаПро: ${String(raw.schemaVersion ?? 'не указана')}.`);
   if (!Array.isArray(raw.items) || raw.items.length > MAX_ESTIMATE_ITEMS) throw new Error('Файл содержит некорректный список позиций сметы.');
   const now = Date.now();
   const items: EstimateItem[] = raw.items.map((value, index) => {
@@ -92,7 +86,7 @@ function parseEstimate(value: unknown): Estimate {
   return estimate;
 }
 
-/** Imports only the current canonical checknew estimate format. */
+/** Imports only the current canonical СметаПро estimate format. */
 export async function importFromFile(file: File): Promise<Estimate> {
   const text = await file.text();
   const lowerName = file.name.toLowerCase();
@@ -101,15 +95,15 @@ export async function importFromFile(file: File): Promise<Estimate> {
     try { return parseEstimate(JSON.parse(text)); }
     catch (error) {
       if (error instanceof Error && error.message.includes('Неподдерживаемая версия сметы')) throw error;
-      throw new Error('Файл не является корректной сметой checknew.');
+      throw new Error('Файл не является корректной сметой СметаПро.');
     }
   }
   const match = text.match(/<script[^>]*id=["']smeta-app-data["'][^>]*>([\s\S]*?)<\/script>/i);
-  if (!match?.[1]) throw new Error('В HTML файле не найдены данные сметы checknew.');
+  if (!match?.[1]) throw new Error('В HTML файле не найдены данные сметы СметаПро.');
   try { return parseEstimate(JSON.parse(match[1])); }
   catch (error) {
     if (error instanceof Error && error.message.includes('Неподдерживаемая версия сметы')) throw error;
-    throw new Error('Не удалось прочитать данные сметы из HTML файла.');
+    throw new Error('Не удалось прочитать данные сметы из HTML-файла СметаПро.');
   }
 }
 

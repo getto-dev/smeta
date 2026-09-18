@@ -44,3 +44,12 @@ test('migrateEstimateStorageValues ignores invalid persisted entries', () => {
   assert.deepEqual(result.estimates.map((estimate) => estimate.id), ['current', 'legacy']);
   assert.equal(result.migrated, true);
 });
+
+test('migrateEstimateStorageValues keeps the newest copy when the same id exists in both stores', () => {
+  const current = [makeEstimate('shared', 100)];
+  const legacy = [makeEstimate('shared', 200)];
+  const result = migrateEstimateStorageValues(JSON.stringify(current), JSON.stringify(legacy));
+  assert.equal(result.estimates.length, 1);
+  assert.equal(result.estimates[0]?.updatedAt, 200);
+  assert.equal(result.migrated, true);
+});

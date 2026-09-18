@@ -9,6 +9,7 @@ interface CatalogBrowserProps {
   catalogItems: CatalogItem[];
   categories: string[];
   activeEstimateItems: EstimateItem[];
+  synonyms?: string[][];
   onAddItem: (item: CatalogItem, quantity: number) => void;
   onOpenCustomModal: () => void;
 }
@@ -17,6 +18,7 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
   catalogItems,
   categories,
   activeEstimateItems,
+  synonyms,
   onAddItem,
   onOpenCustomModal,
 }) => {
@@ -45,9 +47,10 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
     return searchCatalogItems(
       catalogItems,
       searchQuery,
-      selectedCategory === 'all' ? undefined : selectedCategory
+      selectedCategory === 'all' ? undefined : selectedCategory,
+      synonyms,
     );
-  }, [catalogItems, selectedCategory, searchQuery]);
+  }, [catalogItems, selectedCategory, searchQuery, synonyms]);
 
   const handleQtyChange = (itemId: string, direction: -1 | 1, step = 0.5) => {
     setItemQuantities((prev) => {
