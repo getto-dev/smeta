@@ -28,6 +28,7 @@ type EstimateStore = {
 
 let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 let saveOperationId = 0;
+let saveQueue: Promise<void> = Promise.resolve();
 let initializationPromise: Promise<void> | null = null;
 
 const persistEstimate = (estimate: Estimate, setStatus: (status: SaveStatus) => void) => {
@@ -36,9 +37,15 @@ const persistEstimate = (estimate: Estimate, setStatus: (status: SaveStatus) => 
   setStatus('saving');
   saveTimeout = setTimeout(async () => {
     saveTimeout = null;
+    saveQueue = saveQueue
+      .catch(() => undefined)
+      .then(async () => {
+        await estimateRepository.save(estimate);
+        estimateRepository.setActiveId(estimate.id);
+      });
+
     try {
-      await estimateRepository.save(estimate);
-      estimateRepository.setActiveId(estimate.id);
+      await saveQueue;
       if (operationId === saveOperationId) setStatus('saved');
     } catch (error) {
       console.error('Failed to auto-save estimate:', error);
