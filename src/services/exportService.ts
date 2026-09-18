@@ -1,6 +1,7 @@
 import { Estimate, EstimateItem, ESTIMATE_SCHEMA_VERSION } from '../types';
 import { calculateEstimateTotals, calculateLineTotal } from '../domain/estimate/calculations';
 import { formatQuantity } from '../utils/quantity';
+import { getEstimateNumber } from '../domain/estimate/number';
 import { isValidEstimate, MAX_ESTIMATE_ITEMS } from '../utils/validation';
 
 /** Loads the heavy PDF exporter only when a PDF is actually requested. */
@@ -28,15 +29,6 @@ export function formatDate(dateString: string): string {
 }
 
 function money(kopecks: number): string { return formatCurrency(kopecks).replace(/\u00a0/g, ' '); }
-
-export function getEstimateNumber(estimate: Estimate): string {
-  const d = estimate.date ? new Date(estimate.date) : new Date();
-  const year = isNaN(d.getTime()) ? new Date() : d;
-  const yy = String(year.getFullYear()).slice(-2);
-  const mm = String(year.getMonth() + 1).padStart(2, '0');
-  const dd = String(year.getDate()).padStart(2, '0');
-  return `${yy}${mm}${dd}-01`;
-}
 
 function parseEstimate(value: unknown): Estimate {
   if (!value || typeof value !== 'object') throw new Error('Некорректная структура файла сметы.');
