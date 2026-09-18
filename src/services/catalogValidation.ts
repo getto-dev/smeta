@@ -113,12 +113,13 @@ export const validateRemoteManifest = (value: unknown, expectedProfileId: string
   const synonyms = files.synonyms === undefined ? undefined : assertSafeFileName(files.synonyms, expectedProfileId + ' synonyms file');
   const config = files.config === undefined ? undefined : assertSafeFileName(files.config, expectedProfileId + ' config file');
 
-  const itemCount = manifest.itemCount === undefined ? undefined : manifest.itemCount;
-  if (itemCount !== undefined && (!Number.isInteger(itemCount) || itemCount < 0 || itemCount > MAX_CATALOG_ITEMS)) {
+  const rawItemCount = manifest.itemCount;
+  const itemCount = rawItemCount === undefined ? undefined : rawItemCount;
+  if (itemCount !== undefined && (typeof itemCount !== 'number' || !Number.isInteger(itemCount) || itemCount < 0 || itemCount > MAX_CATALOG_ITEMS)) {
     throw new Error(expectedProfileId + ': invalid itemCount');
   }
 
-  return { schemaVersion: 1, id, name, description, icon, color, version, locale, currency, files: { catalog, categories, synonyms, config }, itemCount };
+  return { schemaVersion: 1, id, name, description, icon, color, version, locale, currency, files: { catalog, categories, synonyms, config }, itemCount: itemCount as number | undefined };
 };
 
 export const validateRemoteCategories = (value: unknown, profileId = 'catalog'): RemoteCategory[] => {
@@ -152,7 +153,7 @@ export const validateRemoteDataset = (value: unknown, profileId = 'catalog'): Re
     const description = item.description === undefined ? undefined : assertString(item.description, profileId + ' item ' + id + ' description', MAX_DESCRIPTION);
     const priceKopecks = item.priceKopecks;
     const type = item.type;
-    if (!Number.isSafeInteger(priceKopecks) || priceKopecks < 0) throw new Error(profileId + ' item ' + id + ': invalid safe integer price');
+    if (typeof priceKopecks !== 'number' || !Number.isSafeInteger(priceKopecks) || priceKopecks < 0) throw new Error(profileId + ' item ' + id + ': invalid safe integer price');
     if (type !== 'service' && type !== 'material') throw new Error(profileId + ' item ' + id + ': invalid type');
     if (seen.has(id)) throw new Error(profileId + ': duplicate item id ' + id);
     seen.add(id);
