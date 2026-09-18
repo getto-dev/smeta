@@ -62,6 +62,11 @@ jobs:
           test ! -e dist/data/profiles/electrical/catalog.json
           test ! -e dist/data/profiles/finishing/catalog.json
           test ! -e dist/data/profiles/construction/catalog.json
+          if grep -R -n -e 'check-data' -e 'checknew' dist; then
+            echo 'Found legacy project/data-source references in build output.'
+            exit 1
+          fi
+          grep -q 'smeta-remote-data-v5' dist/sw.js
 
       - name: Verify repository has no legacy project/data paths
         run: |
