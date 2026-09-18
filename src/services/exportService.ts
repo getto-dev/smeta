@@ -2,6 +2,8 @@ import { Estimate, EstimateItem, ESTIMATE_SCHEMA_VERSION } from '../types';
 import { calculateEstimateTotals, calculateLineTotal } from '../domain/estimate/calculations';
 import { formatQuantity } from '../utils/quantity';
 import { getEstimateNumber } from '../domain/estimate/number';
+
+export { getEstimateNumber };
 import { isValidEstimate, MAX_ESTIMATE_ITEMS } from '../utils/validation';
 
 /** Loads the heavy PDF exporter only when a PDF is actually requested. */
