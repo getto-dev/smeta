@@ -54,7 +54,7 @@ class StorageService {
   constructor() {
     this.isIndexedDBAvailable = typeof window !== 'undefined' && 'indexedDB' in window;
     if (this.isIndexedDBAvailable) void this.initDB().catch(() => undefined);
-    this.migrateLegacyLocalStorageEstimates();
+    if (typeof localStorage !== 'undefined') this.migrateLegacyLocalStorageEstimates();
   }
 
   private initDB(): Promise<IDBDatabase> {
