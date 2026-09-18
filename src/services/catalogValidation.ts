@@ -1,5 +1,3 @@
-import type { CatalogItem, ProfileCatalog, ProfileMeta } from '../types';
-
 export const REMOTE_DATA_BASE_URL = 'https://raw.githubusercontent.com/getto-dev/smeta/main/data/';
 export const PROFILE_ID_RE = /^[a-z0-9_-]{1,64}$/i;
 
@@ -184,53 +182,3 @@ export const validateRemoteConfig = (value: unknown, expectedProfileId: string):
   if (!/^[A-Z]{3}$/.test(currency)) throw new Error(expectedProfileId + ': config currency is invalid');
   return { schemaVersion: 1, profileId: expectedProfileId, name, locale, currency, features: config.features && typeof config.features === 'object' ? config.features as Record<string, unknown> : undefined };
 };
-
-export function mapRemoteProfile(
-  manifest: RemoteManifest,
-  indexEntry: RemoteIndexEntry,
-  categories: RemoteCategory[],
-): ProfileMeta {
-  return {
-    id: indexEntry.id,
-    name: manifest.name,
-    description: manifest.description,
-    icon: manifest.icon,
-    color: manifest.color,
-    manifestUrl: REMOTE_DATA_BASE_URL + indexEntry.manifest,
-    categories: categories.map((category) => category.name),
-    itemCount: manifest.itemCount,
-    version: manifest.version,
-  };
-}
-
-export function mapRemoteCatalog(
-  profileId: string,
-  manifest: RemoteManifest,
-  categories: RemoteCategory[],
-  dataset: RemoteDataset,
-  synonyms?: string[][],
-): ProfileCatalog {
-  const categoryMap = new Map(categories.map((category) => [category.id, category.name]));
-  for (const item of dataset.items) {
-    if (!categoryMap.has(item.categoryId)) throw new Error(profileId + ': unknown category ' + item.categoryId + ' for ' + item.id);
-  }
-
-  return {
-    id: profileId,
-    name: manifest.name,
-    description: manifest.description,
-    icon: manifest.icon,
-    categories: categories.map((category) => category.name),
-    items: dataset.items.map((item): CatalogItem => ({
-      id: item.id,
-      name: item.name,
-      category: categoryMap.get(item.categoryId) ?? item.categoryId,
-      categoryId: item.categoryId,
-      unit: item.unit,
-      price: item.priceKopecks,
-      type: item.type === 'material' ? 'material' : 'work',
-      description: item.description,
-    })),
-    synonyms,
-  };
-}
