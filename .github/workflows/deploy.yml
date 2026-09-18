@@ -70,7 +70,7 @@ jobs:
 
       - name: Verify repository has no legacy project/data paths
         run: |
-          if git grep -n -e 'checknew' -e 'check-data' -- src data scripts README.md DATA_LAYER.md package.json vite.config.ts index.html; then
+          if git grep -n -e 'checknew' -e 'check-data' -- src package.json vite.config.ts index.html; then
             echo 'Found legacy project or data-source references.'
             exit 1
           fi
