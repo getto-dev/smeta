@@ -157,7 +157,7 @@ export const validateRemoteDataset = (value: unknown, profileId = 'catalog'): Re
     if (type !== 'service' && type !== 'material') throw new Error(profileId + ' item ' + id + ': invalid type');
     if (seen.has(id)) throw new Error(profileId + ': duplicate item id ' + id);
     seen.add(id);
-    return { id, name, unit, categoryId, priceKopecks, description, type };
+    return { id, name, unit, categoryId, priceKopecks, description, type: type as 'service' | 'material' };
   });
 
   return { schemaVersion: 1, items };
