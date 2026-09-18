@@ -145,12 +145,15 @@ export function validateProfileCatalog(data: unknown): ProfileCatalog {
     icon: typeof catalog.icon === 'string' && catalog.icon.length <= 50 ? catalog.icon : 'Wrench',
     categories,
     items: validItems,
-    synonyms: Array.isArray(catalog.synonyms)
-      ? catalog.synonyms
-        .filter((group): group is string[] => Array.isArray(group))
-        .map((group) => group.filter((entry): entry is string => typeof entry === 'string').map((entry) => entry.trim()))
-        .filter((group) => group.length >= 2)
-      : undefined,
+    synonyms: catalog.synonyms === undefined ? undefined : (() => {
+      if (!Array.isArray(catalog.synonyms)) throw new Error('Каталог содержит некорректные синонимы');
+      return catalog.synonyms.map((group, index) => {
+        if (!Array.isArray(group) || group.length < 2 || group.some((entry) => typeof entry !== 'string' || !entry.trim())) {
+          throw new Error('Некорректная группа синонимов #' + (index + 1));
+        }
+        return group.map((entry) => entry.trim());
+      });
+    })(),
   };
 }
 
