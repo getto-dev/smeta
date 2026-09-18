@@ -1,4 +1,4 @@
-const BASE = 'https://raw.githubusercontent.com/getto-dev/check-data/main/';
+const BASE = 'https://raw.githubusercontent.com/getto-dev/smeta/main/data/';
 
 const fetchJson = async (path) => {
   const response = await fetch(`${BASE}${path}`);
@@ -37,12 +37,12 @@ try {
     assertString(manifest.color, `${id}: color`);
     if (!manifest.files?.catalog || !manifest.files?.categories) throw new Error(`${id}: incomplete manifest files`);
 
-    const catalog = await fetchJson(`${id}/${manifest.files.catalog}`);
+    const catalog = await fetchJson(`profiles/${id}/${manifest.files.catalog}`);
     if (!Number.isInteger(catalog.schemaVersion) || catalog.schemaVersion < 1) throw new Error(`${id}: invalid catalog schemaVersion`);
     if (!Array.isArray(catalog.items)) throw new Error(`${id}: catalog.items must be an array`);
     if (manifest.itemCount !== undefined && catalog.items.length !== manifest.itemCount) throw new Error(`${id}: itemCount mismatch (${manifest.itemCount} !== ${catalog.items.length})`);
 
-    const categories = await fetchJson(`${id}/${manifest.files.categories}`);
+    const categories = await fetchJson(`profiles/${id}/${manifest.files.categories}`);
     if (!Array.isArray(categories.categories)) throw new Error(`${id}: categories.categories must be an array`);
     const categoryIds = new Set(categories.categories.map((category) => category.id));
     if (categoryIds.size !== categories.categories.length) throw new Error(`${id}: duplicate category id`);

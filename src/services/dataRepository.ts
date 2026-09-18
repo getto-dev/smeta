@@ -1,6 +1,6 @@
 import { CatalogItem, ProfileCatalog, ProfileMeta } from '../types';
 
-export const REMOTE_DATA_BASE_URL = 'https://raw.githubusercontent.com/getto-dev/check-data/main/';
+export const REMOTE_DATA_BASE_URL = 'https://raw.githubusercontent.com/getto-dev/smeta/main/data/';
 
 type RemoteIndexEntry = { id: string; manifest: string };
 type RemoteIndex = { schemaVersion: number; profiles: RemoteIndexEntry[] };
@@ -159,7 +159,7 @@ export async function fetchRemoteProfileMetas(): Promise<ProfileMeta[]> {
   return Promise.all(index.profiles.map(async ({ id, manifest: manifestPath }) => {
     const manifest = validateManifest(await fetchCachedMetadata<unknown>(remoteDataUrl(manifestPath)), id);
     const categories = manifest.files.categories
-      ? validateCategories(await fetchCachedMetadata<unknown>(remoteDataUrl(`${id}/${manifest.files.categories}`)))
+      ? validateCategories(await fetchCachedMetadata<unknown>(remoteDataUrl(`profiles/${id}/${manifest.files.categories}`)))
       : [];
     return {
       id,
@@ -178,12 +178,12 @@ export async function fetchRemoteProfileMetas(): Promise<ProfileMeta[]> {
 export async function fetchRemoteProfileCatalog(profileId: string): Promise<ProfileCatalog> {
   if (!PROFILE_ID_RE.test(profileId)) throw new Error(`Некорректный id профиля: ${profileId}`);
   const { manifest } = await fetchRemoteProfile(profileId);
-  const dataset = validateDataset(await fetchJson<unknown>(remoteDataUrl(`${profileId}/${manifest.files.catalog}`)));
+  const dataset = validateDataset(await fetchJson<unknown>(remoteDataUrl(`profiles/${profileId}/${manifest.files.catalog}`)));
   const categories = manifest.files.categories
-    ? validateCategories(await fetchCachedMetadata<unknown>(remoteDataUrl(`${profileId}/${manifest.files.categories}`)))
+    ? validateCategories(await fetchCachedMetadata<unknown>(remoteDataUrl(`profiles/${profileId}/${manifest.files.categories}`)))
     : [];
   const synonyms = manifest.files.synonyms
-    ? parseSynonyms(await fetchCachedMetadata<unknown>(remoteDataUrl(`${profileId}/${manifest.files.synonyms}`)))
+    ? parseSynonyms(await fetchCachedMetadata<unknown>(remoteDataUrl(`profiles/${profileId}/${manifest.files.synonyms}`)))
     : undefined;
 
   if (manifest.itemCount !== undefined && manifest.itemCount !== dataset.items.length) throw new Error(`Удалённый каталог ${profileId}: ожидалось ${manifest.itemCount}, получено ${dataset.items.length}`);
