@@ -9,5 +9,5 @@ export function getEstimateNumber(estimate: Pick<Estimate, 'date'>): string {
       + String(now.getDate()).padStart(2, '0')
       + '-01';
   }
-  return match[1].slice(-2) + match[2] + match[3] + '-01';
+  return match[1]! .slice(-2) + match[2]! + match[3]! + '-01';
 }
