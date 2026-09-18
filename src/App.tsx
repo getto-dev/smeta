@@ -75,7 +75,7 @@ export default function App() {
             </div>
             <div className={`lg:col-span-6 xl:col-span-6 h-full flex flex-col min-h-0 space-y-3 ${mobileTab === 'estimate' ? 'block' : 'hidden lg:flex'}`}>
               <EstimateSummary totals={totals} estimate={estimate} saveStatus={saveStatus} onUpdateDiscount={updateDiscount} onOpenCustomerInfo={() => setIsCustomerModalOpen(true)} onOpenExportModal={() => setIsExportModalOpen(true)} onClearAll={clearEstimate} />
-              <EstimateTable items={estimate.items} onUpdateQuantity={updateItemQuantity} onUpdatePrice={updateItemPrice} onDeleteItem={deleteItem} onClearAll={clearEstimate} onSwitchToCatalog={() => setMobileTab('catalog')} />
+              <EstimateTable items={estimate.items} onUpdateQuantity={updateItemQuantity} onUpdatePrice={updateItemPrice} onDeleteItem={deleteItem} onSwitchToCatalog={() => setMobileTab('catalog')} />
             </div>
           </div>
         )}
