@@ -106,6 +106,7 @@ export function validateProfileCatalog(data: unknown): ProfileCatalog {
     const categoryId = typeof item.categoryId === 'string' ? item.categoryId.trim() : '';
     const unit = typeof item.unit === 'string' ? item.unit.trim() : '';
     const price = item.price;
+    const rawType = (item as Partial<CatalogItem> & { type?: string }).type;
 
     if (!itemId || itemId.length > MAX_ID || seenIds.has(itemId)) {
       throw new Error('Позиция #' + (idx + 1) + ' имеет неверный id');
