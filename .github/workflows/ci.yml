@@ -2,8 +2,6 @@ name: CI
 
 on:
   push:
-    branches-ignore:
-      - main
   pull_request:
 
 permissions:
@@ -32,7 +30,7 @@ jobs:
         run: npm run validate:remote-data
 
       - name: Typecheck
-        run: npm run lint
+        run: npm run typecheck
 
       - name: Unit tests
         run: npm test
@@ -42,14 +40,10 @@ jobs:
         env:
           BASE_PATH: /smeta/
 
-      - name: Verify build has no legacy Pages path
+      - name: Verify build has no legacy project/data paths
         run: |
-          legacy_slug='checknew'
-          legacy_pages_path="/${legacy_slug}/"
-          legacy_pages_url="https://getto-dev.github.io/${legacy_slug}"
-          legacy_repo_url="https://github.com/getto-dev/${legacy_slug}"
-          if git grep -n -e "$legacy_pages_path" -e "$legacy_pages_url" -e "$legacy_repo_url"; then
-            echo 'Found legacy project Pages/repository path references.'
+          if git grep -n -e 'checknew' -e 'check-data' -- src data scripts README.md DATA_LAYER.md package.json vite.config.ts index.html; then
+            echo 'Found legacy project or data-source references.'
             exit 1
           fi
           grep -q '/smeta/' dist/manifest.webmanifest
