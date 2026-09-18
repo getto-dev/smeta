@@ -71,7 +71,7 @@ export default function App() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0 items-stretch">
             <div className={`lg:col-span-6 xl:col-span-6 h-full flex flex-col min-h-0 ${mobileTab === 'catalog' ? 'block' : 'hidden lg:flex'}`}>
-              <CatalogBrowser catalogItems={currentCatalog?.items || []} categories={currentCatalog?.categories || []} activeEstimateItems={estimate.items} onAddItem={(item: CatalogItem, qty: number) => addItem(item, qty)} onOpenCustomModal={() => setIsCustomItemModalOpen(true)} />
+              <CatalogBrowser catalogItems={currentCatalog?.items || []} categories={currentCatalog?.categories || []} activeEstimateItems={estimate.items} onAddItem={(item: CatalogItem, qty: number) => addItem(item, qty)} synonyms={currentCatalog?.synonyms} onOpenCustomModal={() => setIsCustomItemModalOpen(true)} />
             </div>
             <div className={`lg:col-span-6 xl:col-span-6 h-full flex flex-col min-h-0 space-y-3 ${mobileTab === 'estimate' ? 'block' : 'hidden lg:flex'}`}>
               <EstimateSummary totals={totals} estimate={estimate} saveStatus={saveStatus} onUpdateDiscount={updateDiscount} onOpenCustomerInfo={() => setIsCustomerModalOpen(true)} onOpenExportModal={() => setIsExportModalOpen(true)} onClearAll={clearEstimate} />
