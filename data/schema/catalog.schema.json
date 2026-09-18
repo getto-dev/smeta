@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/getto-dev/smeta/main/data/schema/catalog.schema.json",
+  "title": "SmetaPro catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "items"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "items": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "unit",
+          "priceKopecks",
+          "categoryId",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "priceKopecks": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "categoryId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "type": {
+            "enum": [
+              "service",
+              "material"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
