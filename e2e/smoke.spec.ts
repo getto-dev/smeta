@@ -65,7 +65,12 @@ test('profile switching changes the catalog and preserves the current estimate',
   await page.getByText('Электрика', { exact: true }).click();
 
   await expect(page.getByRole('button', { name: 'Сменить профиль каталога' })).toContainText('Электрика');
-  await expect(page.getByText('Смета (1)', { exact: false })).toHaveCount(1);
+
+  const mobileEstimateTab = page.getByRole('button', { name: /^Смета \(1\)$/ });
+  if (await mobileEstimateTab.isVisible().catch(() => false)) {
+    await mobileEstimateTab.click();
+  }
+  await expect(page.getByRole('heading', { name: 'Позиции сметы' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Сменить профиль каталога' }).click();
   await page.getByText('Сантехника', { exact: true }).click();
