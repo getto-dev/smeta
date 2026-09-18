@@ -67,7 +67,7 @@ const assertString = (value: unknown, label: string, maxLength = Number.POSITIVE
 
 const assertSafeFileName = (value: unknown, label: string): string => {
   const name = assertString(value, label, 200);
-  if (!/^[a-zA-Z0-9._-]+\\.json$/.test(name) || name.includes('..')) throw new Error(label + ' must be a simple JSON file name');
+  if (!/^[a-zA-Z0-9._-]+\.json$/.test(name) || name.includes('..')) throw new Error(label + ' must be a simple JSON file name');
   return name;
 };
 
