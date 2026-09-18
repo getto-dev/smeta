@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateLineTotal } from './calculations';
+import { calculateEstimateTotals, calculateLineTotal } from './calculations';
 
 test('calculateLineTotal rounds fractional quantities to integer kopecks', () => {
   assert.equal(calculateLineTotal(19999, 1.5), 29999);
