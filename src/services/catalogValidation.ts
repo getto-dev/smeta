@@ -180,5 +180,8 @@ export const validateRemoteConfig = (value: unknown, expectedProfileId: string):
   const locale = assertString(config.locale, expectedProfileId + ' config locale', 50);
   const currency = assertString(config.currency, expectedProfileId + ' config currency', 3);
   if (!/^[A-Z]{3}$/.test(currency)) throw new Error(expectedProfileId + ': config currency is invalid');
-  return { schemaVersion: 1, profileId: expectedProfileId, name, locale, currency, features: config.features && typeof config.features === 'object' ? config.features as Record<string, unknown> : undefined };
+  if (config.features !== undefined && (!config.features || typeof config.features !== 'object' || Array.isArray(config.features))) {
+    throw new Error(expectedProfileId + ': config features must be an object');
+  }
+  return { schemaVersion: 1, profileId: expectedProfileId, name, locale, currency, features: config.features as Record<string, unknown> | undefined };
 };
