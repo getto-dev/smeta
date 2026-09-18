@@ -160,7 +160,7 @@ export const AddCustomItemModal: React.FC<AddCustomItemModalProps> = ({
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Количество <span className="text-amber-400">*</span></label>
-              <input type="number" min="0.01" step="any" required value={quantity} onChange={(e) => setQuantity(e.target.value === '' ? '' : parseFloat(e.target.value))} placeholder="1" className="w-full rounded-xl bg-slate-950 border border-slate-700 px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-amber-500" />
+              <input type="number" min="0.5" step="0.5" required value={quantity} onChange={(e) => setQuantity(e.target.value === '' ? '' : parseFloat(e.target.value))} placeholder="1" className="w-full rounded-xl bg-slate-950 border border-slate-700 px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-amber-500" />
             </div>
           </div>
 
