@@ -19,6 +19,16 @@ test('searchCatalogItems supports construction synonyms', () => {
   assert.equal(searchCatalogItems(catalog, 'розетка')[0]?.id, '3');
 });
 
+test('searchCatalogItems combines global and profile-specific synonyms', () => {
+  const catalogWithSink: CatalogItem[] = [
+    ...catalog,
+    { id: '6', name: 'Умывальник подвесной', category: 'Сантехника', categoryId: 'plumbing', unit: 'шт', price: 90000, type: 'material' },
+  ];
+
+  assert.equal(searchCatalogItems(catalogWithSink, 'мойка', undefined, [['раковина', 'мойка']])[0]?.id, '6');
+  assert.equal(searchCatalogItems(catalog, 'кран', undefined, [['насосная станция', 'гидроузел']])[0]?.id, '4');
+});
+
 test('searchCatalogItems respects category filter', () => {
   const result = searchCatalogItems(catalog, '', 'Отопление');
   assert.deepEqual(result.map((item) => item.id), ['2']);
