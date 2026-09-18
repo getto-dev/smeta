@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "profiles": [
+    {"id":"plumbing","manifest":"profiles/plumbing/manifest.json"},
+    {"id":"electrical","manifest":"profiles/electrical/manifest.json"},
+    {"id":"finishing","manifest":"profiles/finishing/manifest.json"},
+    {"id":"construction","manifest":"profiles/construction/manifest.json"}
+  ]
+}

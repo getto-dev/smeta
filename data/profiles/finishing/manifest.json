@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "finishing",
+  "name": "Отделочные работы",
+  "description": "Штукатурка, шпаклевка, малярные работы, укладка плитки, напольные покрытия",
+  "icon": "Paintbrush",
+  "color": "emerald",
+  "version": "1.0.0",
+  "locale": "ru-RU",
+  "currency": "RUB",
+  "files": {
+    "catalog": "catalog.json",
+    "categories": "categories.json",
+    "config": "config.json"
+  },
+  "itemCount": 14
+}
