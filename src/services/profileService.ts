@@ -12,7 +12,7 @@ const MAX_ITEM_UNIT_LENGTH = 50;
 const MAX_ITEM_CODE_LENGTH = 100;
 const MAX_ITEM_CATEGORY_ID_LENGTH = 128;
 const PROFILE_ID_RE = /^[a-z0-9_-]{1,64}$/i;
-const REMOTE_MANIFEST_BASE = 'https://raw.githubusercontent.com/getto-dev/check-data/main/';
+const REMOTE_MANIFEST_BASE = 'https://raw.githubusercontent.com/getto-dev/smeta/main/data/';
 
 export function validateProfileMeta(data: unknown): ProfileMeta[] {
   if (!Array.isArray(data)) throw new Error('Некорректный список профилей: ожидается массив');
