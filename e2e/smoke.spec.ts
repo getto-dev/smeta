@@ -51,3 +51,23 @@ test('settings opens and contains install action and Telegram contact', async ({
   await expect(page.getByRole('button', { name: /Установка приложения/ })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Связаться в Telegram' })).toBeVisible();
 });
+
+
+test('profile switching changes the catalog and preserves the current estimate', async ({ page }) => {
+  await page.goto('./');
+
+  const addButton = page.getByRole('button', { name: 'В смету' }).first();
+  await expect(addButton).toBeVisible();
+  await addButton.click();
+
+  await page.getByRole('button', { name: 'Сменить профиль каталога' }).click();
+  await expect(page.getByRole('heading', { name: 'Профили деятельности' })).toBeVisible();
+  await page.getByText('Электрика', { exact: true }).click();
+
+  await expect(page.getByRole('button', { name: 'Сменить профиль каталога' })).toContainText('Электрика');
+  await expect(page.getByText('Смета (1)', { exact: false })).toHaveCount(1);
+
+  await page.getByRole('button', { name: 'Сменить профиль каталога' }).click();
+  await page.getByText('Сантехника', { exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Сменить профиль каталога' })).toContainText('Сантехника');
+});
