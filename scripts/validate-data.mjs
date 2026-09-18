@@ -11,10 +11,6 @@ const assertString = (value, label) => {
   if (typeof value !== 'string' || value.trim().length === 0) fail(`${label} must be a non-empty string`);
 };
 
-const assertPositiveInteger = (value, label) => {
-  if (!Number.isInteger(value) || value < 1) fail(`${label} must be a positive integer`);
-};
-
 const main = async () => {
   const index = await readJson('index.json');
   if (index.schemaVersion !== 1 || !Array.isArray(index.profiles)) {
@@ -27,6 +23,9 @@ const main = async () => {
     assertString(profile.manifest, `profile ${profile.id} manifest`);
 
     if (profileIds.has(profile.id)) fail(`Duplicate profile id: ${profile.id}`);
+    if (!profile.manifest.startsWith('profiles/') || profile.manifest.includes('..') || !profile.manifest.endsWith('/manifest.json')) {
+      fail(`profile ${profile.id}: invalid manifest path`);
+    }
     profileIds.add(profile.id);
 
     const manifest = await readJson(profile.manifest);
