@@ -2,6 +2,7 @@ import { PDFDocument, rgb, PDFFont } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import { Estimate, EstimateItem } from '../types';
 import { formatCurrency } from './exportService';
+import { getEstimateNumber } from '../domain/estimate/number';
 import { calculateEstimateTotals, calculateLineTotal } from '../domain/estimate/calculations';
 import { formatQuantity } from '../utils/quantity';
 
@@ -122,15 +123,6 @@ function rightTextX(
   right: number
 ): number {
   return right - font.widthOfTextAtSize(value, size);
-}
-
-export function getEstimateNumber(estimate: Estimate): string {
-  const d = estimate.date ? new Date(estimate.date) : new Date();
-  const year = isNaN(d.getTime()) ? new Date() : d;
-  const yy = String(year.getFullYear()).slice(-2);
-  const mm = String(year.getMonth() + 1).padStart(2, '0');
-  const dd = String(year.getDate()).padStart(2, '0');
-  return `${yy}${mm}${dd}-01`;
 }
 
 /**
