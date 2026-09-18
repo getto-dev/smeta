@@ -3,6 +3,8 @@ import fontkit from '@pdf-lib/fontkit';
 import { Estimate, EstimateItem } from '../types';
 import { formatCurrency } from './exportService';
 import { getEstimateNumber } from '../domain/estimate/number';
+
+export { getEstimateNumber };
 import { calculateEstimateTotals, calculateLineTotal } from '../domain/estimate/calculations';
 import { formatQuantity } from '../utils/quantity';
 
