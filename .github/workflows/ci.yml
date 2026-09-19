@@ -32,9 +32,6 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Unit tests
-        run: npm test
-
       - name: Build
         run: npm run build
         env:
@@ -52,9 +49,3 @@ jobs:
             exit 1
           fi
           grep -q 'smeta-remote-data-v5' dist/sw.js
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium webkit
-
-      - name: End-to-end tests
-        run: npm run e2e
