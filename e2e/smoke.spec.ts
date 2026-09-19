@@ -195,7 +195,7 @@ test('catalog search and category filter preserve a usable mobile flow', async (
   await expect(search).toHaveValue('труба');
 });
 
-test('mobile content has no horizontal overflow across the viewport matrix', async ({ page, testInfo }) => {
+test('mobile content has no horizontal overflow across the viewport matrix', async ({ page }, testInfo) => {
   if (!testInfo.project.name.startsWith('mobile-') && testInfo.project.name !== 'mobile-safari') return;
   await page.goto('./');
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
