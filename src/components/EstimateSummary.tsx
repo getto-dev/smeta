@@ -91,7 +91,7 @@ export const EstimateSummary: React.FC<EstimateSummaryProps> = ({
       <div className="flex items-center justify-between gap-3 rounded-xl border border-amber-500/30 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-3">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-wider text-amber-400/90">Итого к оплате</div>
-          <div className="font-mono text-2xl font-black tracking-tight text-white sm:text-3xl">{formatCurrency(totals.grandTotal)}</div>
+          <div className="whitespace-nowrap font-mono text-2xl font-black tracking-tight text-white sm:text-3xl">{formatCurrency(totals.grandTotal)}</div>
         </div>
         <div className="text-right">
           <div className="flex items-center justify-end gap-1 text-[10px] font-semibold text-slate-400">
@@ -106,11 +106,11 @@ export const EstimateSummary: React.FC<EstimateSummaryProps> = ({
       <div className="grid grid-cols-2 gap-2 text-xs">
         <div className="flex items-center justify-between rounded-lg border border-slate-800/80 bg-slate-950/70 px-2.5 py-2">
           <span className="flex items-center gap-1 truncate text-[11px] font-medium text-amber-300"><Wrench className="h-3 w-3 shrink-0 text-amber-400" /><span>Работы:</span></span>
-          <span className="font-mono text-xs font-bold text-white">{formatCurrency(totals.servicesSum)}</span>
+          <span className="shrink-0 whitespace-nowrap font-mono text-xs font-bold text-white">{formatCurrency(totals.servicesSum)}</span>
         </div>
         <div className="flex items-center justify-between rounded-lg border border-slate-800/80 bg-slate-950/70 px-2.5 py-2">
           <span className="flex items-center gap-1 truncate text-[11px] font-medium text-sky-300"><Package className="h-3 w-3 shrink-0 text-sky-400" /><span>Материалы:</span></span>
-          <span className="font-mono text-xs font-bold text-white">{formatCurrency(totals.productsSum)}</span>
+          <span className="shrink-0 whitespace-nowrap font-mono text-xs font-bold text-white">{formatCurrency(totals.productsSum)}</span>
         </div>
       </div>
 

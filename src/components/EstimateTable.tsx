@@ -128,7 +128,7 @@ export const EstimateTable: React.FC<EstimateTableProps> = ({
                   <span>{category}</span>
                   <span className="text-[11px] font-normal text-slate-400">({categoryItems.length})</span>
                 </span>
-                <span className="font-mono text-xs font-semibold text-amber-400/90">{formatCurrency(sum)}</span>
+                <span className="shrink-0 whitespace-nowrap font-mono text-xs font-semibold text-amber-400/90">{formatCurrency(sum)}</span>
               </button>
 
               {!collapsed && (
@@ -173,7 +173,7 @@ export const EstimateTable: React.FC<EstimateTableProps> = ({
                                   ariaLabel={`Количество: ${item.name}`}
                                   title="Количество, шаг 0.5"
                                   enterKeyHint="done"
-                                  className="w-16 border-0 bg-transparent px-1 text-center sm:w-16"
+                                  className="w-20 border-0 bg-transparent px-1 text-center sm:w-20"
                                 />
                                 <button
                                   type="button"
@@ -210,7 +210,7 @@ export const EstimateTable: React.FC<EstimateTableProps> = ({
                                   <button
                                     type="button"
                                     onClick={() => setEditingPriceId(item.id)}
-                                    className="flex min-h-11 items-center justify-end gap-1 rounded-lg px-2 text-xs font-mono text-slate-300 transition hover:text-amber-400 sm:min-h-0"
+                                    className="flex min-h-11 shrink-0 items-center justify-end gap-1 whitespace-nowrap rounded-lg px-2 text-xs font-mono text-slate-300 transition hover:text-amber-400 sm:min-h-0"
                                     title="Изменить цену"
                                     aria-label={`Изменить цену: ${item.name}`}
                                   >
@@ -219,7 +219,7 @@ export const EstimateTable: React.FC<EstimateTableProps> = ({
                                   </button>
                                 )}
                               </div>
-                              <div className="w-20 text-right font-mono text-xs font-bold text-white sm:text-sm">{formatCurrency(item.total)}</div>
+                              <div className="min-w-28 shrink-0 whitespace-nowrap text-right font-mono text-xs font-bold text-white sm:text-sm">{formatCurrency(item.total)}</div>
                               <Button
                                 type="button"
                                 variant="ghost"
