@@ -41,6 +41,8 @@ export const EditEstimateItemModal: React.FC<EditEstimateItemModalProps> = ({
   const [priceRubles, setPriceRubles] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [type, setType] = useState<'work' | 'material'>('work');
+  const [priceValid, setPriceValid] = useState(true);
+  const [quantityValid, setQuantityValid] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -52,6 +54,8 @@ export const EditEstimateItemModal: React.FC<EditEstimateItemModalProps> = ({
     setPriceRubles(item.price / 100);
     setQuantity(item.quantity);
     setType(item.type === 'material' ? 'material' : 'work');
+    setPriceValid(true);
+    setQuantityValid(true);
     setError(null);
   }, [item]);
 
@@ -70,6 +74,7 @@ export const EditEstimateItemModal: React.FC<EditEstimateItemModalProps> = ({
       setError('Укажите единицу измерения');
       return;
     }
+    if (!priceValid || !quantityValid) return;
     if (!Number.isFinite(priceRubles) || priceRubles < 0) {
       setError('Цена должна быть неотрицательным числом');
       return;
@@ -83,7 +88,7 @@ export const EditEstimateItemModal: React.FC<EditEstimateItemModalProps> = ({
       name: name.trim(),
       description: description.trim() || undefined,
       category: category.trim(),
-      categoryId: item.catalogId ? item.categoryId : makeCategoryId(category),
+      categoryId: makeCategoryId(category),
       unit: unit.trim(),
       price: Math.round(priceRubles * 100),
       quantity,
@@ -148,7 +153,8 @@ export const EditEstimateItemModal: React.FC<EditEstimateItemModalProps> = ({
             <FieldLabel htmlFor="edit-item-price">Цена, ₽</FieldLabel>
             <EditableNumberInput
               value={priceRubles}
-              onCommit={(next) => { setPriceRubles(next); setError(null); }}
+              onCommit={(next) => { setPriceRubles(next); setPriceValid(true); setError(null); }}
+              onValidationChange={setPriceValid}
               min={0}
               validate={(next) => Math.abs(next * 100 - Math.round(next * 100)) > 0.000001 ? 'Максимум 2 знака после запятой' : null}
               formatValue={(next) => String(Number(next.toFixed(2)))}
@@ -162,7 +168,8 @@ export const EditEstimateItemModal: React.FC<EditEstimateItemModalProps> = ({
             <FieldLabel htmlFor="edit-item-quantity">Количество</FieldLabel>
             <EditableNumberInput
               value={quantity}
-              onCommit={(next) => { setQuantity(next); setError(null); }}
+              onCommit={(next) => { setQuantity(next); setQuantityValid(true); setError(null); }}
+              onValidationChange={setQuantityValid}
               min={0.5}
               validate={(next) => Math.abs(next * 2 - Math.round(next * 2)) > 0.000001 ? 'Шаг количества: 0.5' : null}
               formatValue={(next) => Number(next.toFixed(1)).toString()}
@@ -177,7 +184,7 @@ export const EditEstimateItemModal: React.FC<EditEstimateItemModalProps> = ({
 
       <div className="mt-5 flex gap-2.5 border-t border-slate-800 pt-4">
         <Button variant="secondary" onClick={onClose} className="flex-1">Отмена</Button>
-        <Button variant="primary" onClick={handleSave} className="flex-1">Сохранить</Button>
+        <Button variant="primary" onClick={handleSave} disabled={!priceValid || !quantityValid} className="flex-1">Сохранить</Button>
       </div>
     </Modal>
   );
