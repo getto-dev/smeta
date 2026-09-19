@@ -84,6 +84,21 @@ body {
     -webkit-overflow-scrolling: touch;
   }
 }
+@media (max-width: 360px) {
+  .mobile-tabs-sticky {
+    padding: 0.375rem;
+  }
+
+  .mobile-tabs-sticky button {
+    font-size: 0.7rem;
+  }
+
+  .mobile-bottom-safe {
+    gap: 0.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
 @media (max-height: 500px) and (orientation: landscape) {
   .landscape-compact {
     padding-top: 0.5rem !important;
