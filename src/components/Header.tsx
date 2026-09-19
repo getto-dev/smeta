@@ -22,7 +22,7 @@ export const Header: React.FC<HeaderProps> = ({ currentProfile, onOpenProfileSel
   const icon = currentProfile?.icon ? ICONS_MAP[currentProfile.icon] : <Wrench className="w-4 h-4" />;
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 no-print">
+    <header className="mobile-screen-inset sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 no-print">
       <div className="max-w-7xl mx-auto w-full px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2 min-w-0">
         <div className="flex items-center gap-2.5 sm:gap-4 min-w-0 flex-1">
           <div className="flex items-center gap-2 min-w-0 flex-shrink-0">
