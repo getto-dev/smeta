@@ -73,7 +73,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         <button
           type="button"
           onClick={handleInstall}
-          disabled={isInstalled}
+          disabled={isInstalled || (!isIOS && !isInstallable)}
           className="flex min-h-14 w-full items-center gap-3 px-4 py-3.5 text-left transition hover:bg-slate-800/60 disabled:cursor-default disabled:hover:bg-transparent"
           aria-label="Установка приложения"
         >
