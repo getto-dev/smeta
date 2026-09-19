@@ -4,6 +4,7 @@ import { CatalogItem, EstimateItem } from '../types';
 import { formatCurrency } from '../services/exportService';
 import { searchCatalogItems } from '../services/smartSearch';
 import { formatQuantity, changeQuantity, normalizeQuantity } from '../utils/quantity';
+import { Button, EditableNumberInput, Modal } from './ui';
 
 interface CatalogBrowserProps {
   catalogItems: CatalogItem[];
@@ -25,9 +26,8 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [itemQuantities, setItemQuantities] = useState<Record<string, number | ''>>({});
+  const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({});
   const [recentlyAddedId, setRecentlyAddedId] = useState<string | null>(null);
-  const [mobileReplaceNextInput, setMobileReplaceNextInput] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (selectedCategory !== 'all' && !categories.includes(selectedCategory)) {
@@ -52,158 +52,176 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
     );
   }, [catalogItems, selectedCategory, searchQuery, synonyms]);
 
-  const handleQtyChange = (itemId: string, direction: -1 | 1, step = 0.5) => {
-    setItemQuantities((prev) => {
-      const current = prev[itemId];
-      const cur = typeof current === 'number' && Number.isFinite(current) ? current : 1;
-      const next = changeQuantity(cur, direction, step);
-      return { ...prev, [itemId]: next };
-    });
+  const getItemQuantity = (itemId: string) => {
+    const value = itemQuantities[itemId];
+    return Number.isFinite(value) && value > 0 ? value : 1;
   };
 
-  const handleManualQtyInput = (itemId: string, valueStr: string) => {
-    const normalized = valueStr.replace(',', '.');
-    if (normalized.trim() === '') {
-      setItemQuantities((prev) => ({ ...prev, [itemId]: '' }));
-      return;
-    }
-
-    if (!/^\d*\.?\d*$/.test(normalized)) return;
-
-    const val = Number(normalized);
-    if (Number.isFinite(val)) {
-      setItemQuantities((prev) => ({ ...prev, [itemId]: val }));
-    }
-  };
-
-  const handleManualQtyBlur = (itemId: string) => {
-    setItemQuantities((prev) => {
-      const current = prev[itemId];
-      if (current === '' || current === undefined || !Number.isFinite(current)) {
-        return { ...prev, [itemId]: 1 };
-      }
-      return { ...prev, [itemId]: normalizeQuantity(current) };
-    });
-    setMobileReplaceNextInput((prev) => ({ ...prev, [itemId]: false }));
-  };
-
-  const handleManualQtyFocus = (itemId: string, input: HTMLInputElement) => {
-    const isTouchDevice = typeof window !== 'undefined'
-      && (window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0);
-
-    if (isTouchDevice) {
-      setMobileReplaceNextInput((prev) => ({ ...prev, [itemId]: true }));
-      input.setSelectionRange(input.value.length, input.value.length);
-      return;
-    }
-
-    input.select();
-  };
-
-  const handleManualQtyChange = (itemId: string, valueStr: string) => {
-    const shouldReplace = mobileReplaceNextInput[itemId];
-    if (shouldReplace) {
-      const normalized = valueStr.replace(',', '.');
-      const currentValue = itemQuantities[itemId];
-      if (typeof currentValue === 'number' && currentValue === 1 && /^1\d*\.?\d*$/.test(normalized)) {
-        const replaced = normalized.slice(1);
-        if (replaced === '') {
-          setMobileReplaceNextInput((prev) => ({ ...prev, [itemId]: false }));
-          setItemQuantities((prev) => ({ ...prev, [itemId]: '' }));
-          return;
-        }
-        setMobileReplaceNextInput((prev) => ({ ...prev, [itemId]: false }));
-        handleManualQtyInput(itemId, replaced);
-        return;
-      }
-      if (normalized !== '1') {
-        setMobileReplaceNextInput((prev) => ({ ...prev, [itemId]: false }));
-      }
-    }
-
-    handleManualQtyInput(itemId, valueStr);
+  const handleQtyChange = (itemId: string, direction: -1 | 1) => {
+    setItemQuantities((prev) => ({
+      ...prev,
+      [itemId]: changeQuantity(getItemQuantity(itemId), direction, 0.5),
+    }));
   };
 
   const handleAdd = (item: CatalogItem) => {
-    const rawQty = itemQuantities[item.id];
-    const qty = normalizeQuantity(typeof rawQty === 'number' && Number.isFinite(rawQty) ? rawQty : 1);
+    const qty = normalizeQuantity(getItemQuantity(item.id));
     onAddItem(item, qty);
     setItemQuantities((prev) => ({ ...prev, [item.id]: 1 }));
-    setMobileReplaceNextInput((prev) => ({ ...prev, [item.id]: false }));
-
     setRecentlyAddedId(item.id);
-    setTimeout(() => {
+    window.setTimeout(() => {
       setRecentlyAddedId((prev) => (prev === item.id ? null : prev));
     }, 1200);
   };
 
   return (
-    <div className="flex flex-col h-full rounded-2xl bg-slate-900 border border-slate-800 shadow-xl overflow-hidden">
-      <div className="p-3.5 sm:p-4 border-b border-slate-800 bg-slate-900/95 backdrop-blur-xs space-y-3 flex-shrink-0">
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-xl">
+      <div className="flex-shrink-0 space-y-3 border-b border-slate-800 bg-slate-900/95 p-3.5 backdrop-blur-xs sm:p-4">
         <div className="flex items-center justify-between gap-2">
-          <button type="button" onClick={() => setIsCategoryModalOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 text-xs font-semibold transition active:scale-95 cursor-pointer whitespace-nowrap" title="Выбрать раздел каталога">
-            <ListFilter className="w-3.5 h-3.5" />
-            <span>{selectedCategory === 'all' ? 'Все разделы' : selectedCategory}</span>
-          </button>
-          <button id="add-custom-item-btn" type="button" onClick={onOpenCustomModal} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 text-xs font-semibold transition active:scale-95 cursor-pointer whitespace-nowrap flex-shrink-0" title="Добавить свою позицию, которой нет в каталоге">
-            <PlusCircle className="w-3.5 h-3.5 text-amber-400" />
+          <Button
+            type="button"
+            onClick={() => setIsCategoryModalOpen(true)}
+            className="min-w-0 flex-1 justify-start truncate px-3 text-xs text-amber-400 sm:flex-none"
+            title="Выбрать раздел каталога"
+          >
+            <ListFilter className="h-4 w-4 shrink-0" />
+            <span className="truncate">{selectedCategory === 'all' ? 'Все разделы' : selectedCategory}</span>
+          </Button>
+          <Button
+            id="add-custom-item-btn"
+            type="button"
+            onClick={onOpenCustomModal}
+            className="shrink-0 px-3 text-xs text-amber-400 sm:text-sm"
+            title="Добавить свою позицию, которой нет в каталоге"
+          >
+            <PlusCircle className="h-4 w-4 text-amber-400" />
             <span>+ Своя позиция</span>
-          </button>
+          </Button>
         </div>
+
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input id="catalog-search-input" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Поиск по названию или синонимам (кран, труба, кабель...)" className="w-full rounded-xl bg-slate-950 border border-slate-700/80 pl-9 pr-8 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition" />
-          {searchQuery && <button type="button" onClick={() => setSearchQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white rounded-md" title="Очистить поиск"><X className="w-3.5 h-3.5" /></button>}
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input
+            id="catalog-search-input"
+            type="text"
+            inputMode="search"
+            enterKeyHint="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Поиск по названию или синонимам"
+            autoComplete="off"
+            className="w-full rounded-xl border border-slate-700/80 bg-slate-950 py-3 pl-9 pr-12 text-base text-white placeholder-slate-500 transition focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 sm:py-2 sm:text-sm"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-800 hover:text-white sm:h-8 sm:w-8"
+              title="Очистить поиск"
+              aria-label="Очистить поиск"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-2.5 min-h-[300px]">
+      <div className="mobile-scroll-safe landscape-no-min-height flex-1 min-h-0 space-y-2.5 overflow-y-auto p-3 pb-24 sm:p-4 sm:pb-4">
         {filteredItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center text-slate-400">
-            <Filter className="w-8 h-8 text-slate-600 mb-2" />
+            <Filter className="mb-2 h-8 w-8 text-slate-600" />
             <p className="text-sm font-medium text-slate-300">Ничего не найдено</p>
-            <p className="text-xs text-slate-500 mt-1">Попробуйте другой запрос или добавьте позицию вручную.</p>
-            <button type="button" onClick={onOpenCustomModal} className="mt-3 px-3.5 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-bold transition active:scale-95 cursor-pointer">+ Добавить вручную</button>
+            <p className="mt-1 text-xs text-slate-500">Попробуйте другой запрос или добавьте позицию вручную.</p>
+            <Button type="button" variant="primary" onClick={onOpenCustomModal} className="mt-3 px-4 text-xs">
+              + Добавить вручную
+            </Button>
           </div>
         ) : (
           filteredItems.map((item) => {
-            const rawCurrentQty = itemQuantities[item.id];
-            const currentQty = typeof rawCurrentQty === 'number' || rawCurrentQty === '' ? rawCurrentQty : 1;
+            const currentQty = getItemQuantity(item.id);
             const inEstimateQty = estimateQuantities.get(item.id) || 0;
             const isMaterial = item.type === 'material';
             const isJustAdded = recentlyAddedId === item.id;
+
             return (
-              <div key={item.id} className={`rounded-xl border p-3 transition flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${isJustAdded ? 'border-emerald-500/80 bg-emerald-500/10' : inEstimateQty > 0 ? 'bg-slate-800/80 border-slate-700/90 shadow-sm' : 'bg-slate-950/60 border-slate-800/80 hover:border-slate-700 hover:bg-slate-800/40'}`}>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                    <span className="text-[10px] text-slate-400 font-medium truncate max-w-[180px]">{item.category}</span>
-                    <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[10px] font-semibold ${isMaterial ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}`}>
-                      {isMaterial ? <><Package className="w-2.5 h-2.5" /> Материал</> : <><Wrench className="w-2.5 h-2.5" /> Работа</>}
+              <div
+                key={item.id}
+                className={`flex flex-col gap-2.5 rounded-xl border p-3 transition sm:flex-row sm:items-center sm:justify-between ${
+                  isJustAdded
+                    ? 'border-emerald-500/80 bg-emerald-500/10'
+                    : inEstimateQty > 0
+                      ? 'border-slate-700/90 bg-slate-800/80 shadow-sm'
+                      : 'border-slate-800/80 bg-slate-950/60 hover:border-slate-700 hover:bg-slate-800/40'
+                }`}
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex flex-wrap items-center gap-1.5">
+                    <span className="max-w-[180px] truncate text-[10px] font-medium text-slate-400">{item.category}</span>
+                    <span className={`inline-flex items-center gap-0.5 rounded border px-1.5 py-0.5 text-[10px] font-semibold ${
+                      isMaterial ? 'border-sky-500/30 bg-sky-500/15 text-sky-400' : 'border-amber-500/30 bg-amber-500/15 text-amber-400'
+                    }`}>
+                      {isMaterial ? <><Package className="h-3 w-3" />Материал</> : <><Wrench className="h-3 w-3" />Работа</>}
                     </span>
-                    {inEstimateQty > 0 && <span className="flex items-center gap-0.5 px-1.5 py-0.2 rounded bg-emerald-500/20 border border-emerald-500/40 text-[10px] text-emerald-400 font-semibold"><Check className="w-3 h-3" /><span>в смете: {formatQuantity(inEstimateQty)} {item.unit}</span></span>}
+                    {inEstimateQty > 0 && (
+                      <span className="flex items-center gap-0.5 rounded border border-emerald-500/40 bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-400">
+                        <Check className="h-3 w-3" />
+                        <span>в смете: {formatQuantity(inEstimateQty)} {item.unit}</span>
+                      </span>
+                    )}
                   </div>
-                  <h3 className="text-xs sm:text-sm font-semibold text-white leading-snug">{item.name}</h3>
-                  {item.description && <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{item.description}</p>}
+                  <h3 className="text-xs font-semibold leading-snug text-white sm:text-sm">{item.name}</h3>
+                  {item.description && <p className="mt-0.5 line-clamp-1 text-[11px] text-slate-400">{item.description}</p>}
                 </div>
-                <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800/60 flex-shrink-0">
-                  <div className="text-left sm:text-right"><div className="text-xs sm:text-sm font-bold text-amber-400 font-mono">{formatCurrency(item.price)}</div><div className="text-[10px] text-slate-400">за 1 {item.unit}</div></div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="flex items-center rounded-lg bg-slate-900 border border-slate-700 p-0.5">
-                      <button type="button" onClick={() => handleQtyChange(item.id, -1, 0.5)} title="Уменьшить" className="w-5 h-6 flex items-center justify-center text-slate-400 hover:text-white rounded hover:bg-slate-800 text-xs font-bold active:scale-95 cursor-pointer">-</button>
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        value={currentQty}
-                        onChange={(e) => handleManualQtyChange(item.id, e.target.value)}
-                        onFocus={(e) => handleManualQtyFocus(item.id, e.currentTarget)}
-                        onBlur={() => handleManualQtyBlur(item.id)}
-                        className="w-9 text-center text-xs font-semibold text-white bg-transparent focus:outline-none font-mono"
-                        title="Количество (можно дробное: 1.5, 2.5)"
-                        aria-label={`Количество: ${item.name}`}
-                      />
-                      <button type="button" onClick={() => handleQtyChange(item.id, 1, 0.5)} title="Увеличить" className="w-5 h-6 flex items-center justify-center text-slate-400 hover:text-white rounded hover:bg-slate-800 text-xs font-bold active:scale-95 cursor-pointer">+</button>
+
+                <div className="flex flex-col gap-2 border-t border-slate-800/60 pt-2 sm:flex-row sm:items-center sm:justify-end sm:border-t-0 sm:pt-0">
+                  <div className="flex items-center justify-between gap-3 sm:justify-end">
+                    <div className="text-left sm:text-right">
+                      <div className="font-mono text-xs font-bold text-amber-400 sm:text-sm">{formatCurrency(item.price)}</div>
+                      <div className="text-[10px] text-slate-400">за 1 {item.unit}</div>
                     </div>
-                    <button type="button" onClick={() => handleAdd(item)} className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition active:scale-95 cursor-pointer shadow-xs whitespace-nowrap ${isJustAdded ? 'bg-emerald-500 text-slate-950 font-bold' : 'bg-amber-500 hover:bg-amber-400 text-slate-950'}`} title="Добавить в смету">{isJustAdded ? '✓ Добавлено' : 'В смету'}</button>
+
+                    <div className="flex items-center gap-1.5">
+                      <div className="flex items-center rounded-xl border border-slate-700 bg-slate-900 p-0.5">
+                        <button
+                          type="button"
+                          onClick={() => handleQtyChange(item.id, -1)}
+                          title="Уменьшить"
+                          className="flex h-11 w-11 items-center justify-center rounded-lg text-base font-bold text-slate-300 transition hover:bg-slate-800 hover:text-white active:scale-95 sm:h-7 sm:w-7 sm:text-xs"
+                          aria-label={`Уменьшить количество: ${item.name}`}
+                        >
+                          −
+                        </button>
+                        <EditableNumberInput
+                          value={currentQty}
+                          onCommit={(next) => setItemQuantities((prev) => ({ ...prev, [item.id]: normalizeQuantity(next) }))}
+                          min={0.5}
+                          validate={(next) => Math.abs(next * 2 - Math.round(next * 2)) > 0.000001 ? 'Шаг: 0.5' : null}
+                          formatValue={(next) => formatQuantity(next)}
+                          ariaLabel={`Количество: ${item.name}`}
+                          title="Количество, шаг 0.5"
+                          enterKeyHint="done"
+                          className="w-14 border-0 bg-transparent px-1 text-center sm:w-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleQtyChange(item.id, 1)}
+                          title="Увеличить"
+                          className="flex h-11 w-11 items-center justify-center rounded-lg text-base font-bold text-slate-300 transition hover:bg-slate-800 hover:text-white active:scale-95 sm:h-7 sm:w-7 sm:text-xs"
+                          aria-label={`Увеличить количество: ${item.name}`}
+                        >
+                          +
+                        </button>
+                      </div>
+                      <Button
+                        type="button"
+                        variant={isJustAdded ? 'secondary' : 'primary'}
+                        onClick={() => handleAdd(item)}
+                        className={`shrink-0 px-3 text-xs ${isJustAdded ? 'text-emerald-300' : ''}`}
+                        title="Добавить в смету"
+                      >
+                        {isJustAdded ? '✓ Добавлено' : 'В смету'}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -212,27 +230,68 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
         )}
       </div>
 
-      {isCategoryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-2xl bg-slate-900 border border-slate-800 p-5 sm:p-6 shadow-2xl text-slate-100 relative max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
-              <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center"><ListFilter className="w-5 h-5" /></div><div><h2 className="text-lg font-bold text-white">Выберите раздел</h2><p className="text-xs text-slate-400">Фильтр позиций каталога</p></div></div>
-              <button type="button" onClick={() => setIsCategoryModalOpen(false)} className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition" aria-label="Закрыть"><X className="w-5 h-5" /></button>
+      <Modal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        labelledBy="catalog-category-title"
+        className="p-5 sm:max-w-lg sm:p-6"
+      >
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/15 text-amber-400">
+              <ListFilter className="h-5 w-5" />
             </div>
-            <div className="space-y-2">
-              <button type="button" onClick={() => { setSelectedCategory('all'); setIsCategoryModalOpen(false); }} className={`w-full flex items-center justify-between gap-3 rounded-xl border px-3.5 py-3 text-left transition ${selectedCategory === 'all' ? 'bg-amber-500/15 border-amber-500/60 text-amber-300' : 'bg-slate-950 border-slate-700 text-slate-200 hover:bg-slate-800'}`}>
-                <div><div className="text-sm font-semibold">Все разделы</div><div className="text-[11px] text-slate-400">Все позиции каталога · {catalogItems.length}</div></div>
-                {selectedCategory === 'all' && <Check className="w-4 h-4 flex-shrink-0" />}
-              </button>
-              {categories.map((category) => {
-                const count = catalogItems.filter((item) => item.category === category).length;
-                const isSelected = selectedCategory === category;
-                return <button key={category} type="button" onClick={() => { setSelectedCategory(category); setIsCategoryModalOpen(false); }} className={`w-full flex items-center justify-between gap-3 rounded-xl border px-3.5 py-3 text-left transition ${isSelected ? 'bg-amber-500/15 border-amber-500/60 text-amber-300' : 'bg-slate-950 border-slate-700 text-slate-200 hover:bg-slate-800'}`}><div className="min-w-0"><div className="text-sm font-semibold truncate">{category}</div><div className="text-[11px] text-slate-400">Позиций: {count}</div></div>{isSelected && <Check className="w-4 h-4 flex-shrink-0" />}</button>;
-              })}
+            <div>
+              <h2 id="catalog-category-title" className="text-lg font-bold text-white">Выберите раздел</h2>
+              <p className="text-xs text-slate-400">Фильтр позиций каталога</p>
             </div>
           </div>
+          <Button variant="ghost" onClick={() => setIsCategoryModalOpen(false)} aria-label="Закрыть" className="min-w-11 px-2 text-xl sm:min-w-0">
+            ×
+          </Button>
         </div>
-      )}
+
+        <div className="mt-4 space-y-2">
+          <button
+            type="button"
+            onClick={() => { setSelectedCategory('all'); setIsCategoryModalOpen(false); }}
+            className={`flex min-h-12 w-full items-center justify-between gap-3 rounded-xl border px-3.5 py-3 text-left transition ${
+              selectedCategory === 'all'
+                ? 'border-amber-500/60 bg-amber-500/15 text-amber-300'
+                : 'border-slate-700 bg-slate-950 text-slate-200 hover:bg-slate-800'
+            }`}
+          >
+            <div>
+              <div className="text-sm font-semibold">Все разделы</div>
+              <div className="text-[11px] text-slate-400">Все позиции каталога · {catalogItems.length}</div>
+            </div>
+            {selectedCategory === 'all' && <Check className="h-4 w-4 shrink-0" />}
+          </button>
+
+          {categories.map((category) => {
+            const count = catalogItems.filter((item) => item.category === category).length;
+            const isSelected = selectedCategory === category;
+            return (
+              <button
+                key={category}
+                type="button"
+                onClick={() => { setSelectedCategory(category); setIsCategoryModalOpen(false); }}
+                className={`flex min-h-12 w-full items-center justify-between gap-3 rounded-xl border px-3.5 py-3 text-left transition ${
+                  isSelected
+                    ? 'border-amber-500/60 bg-amber-500/15 text-amber-300'
+                    : 'border-slate-700 bg-slate-950 text-slate-200 hover:bg-slate-800'
+                }`}
+              >
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold">{category}</div>
+                  <div className="text-[11px] text-slate-400">Позиций: {count}</div>
+                </div>
+                {isSelected && <Check className="h-4 w-4 shrink-0" />}
+              </button>
+            );
+          })}
+        </div>
+      </Modal>
     </div>
   );
 };

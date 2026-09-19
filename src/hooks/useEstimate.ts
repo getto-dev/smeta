@@ -9,7 +9,9 @@ export function useEstimate(currentProfileId = 'plumbing', currentProfileName = 
   const addItem = useEstimateStore((state) => state.addItem);
   const updateItemQuantity = useEstimateStore((state) => state.updateItemQuantity);
   const updateItemPrice = useEstimateStore((state) => state.updateItemPrice);
+  const updateItem = useEstimateStore((state) => state.updateItem);
   const deleteItem = useEstimateStore((state) => state.deleteItem);
+  const restoreItem = useEstimateStore((state) => state.restoreItem);
   const clearEstimate = useEstimateStore((state) => state.clearEstimate);
   const updateDiscount = useEstimateStore((state) => state.updateDiscount);
   const createNewEstimate = useEstimateStore((state) => state.createNewEstimate);
@@ -29,7 +31,9 @@ export function useEstimate(currentProfileId = 'plumbing', currentProfileName = 
     addItem,
     updateItemQuantity,
     updateItemPrice,
+    updateItem,
     deleteItem,
+    restoreItem,
     clearEstimate,
     updateDiscount,
     createNewEstimate,
