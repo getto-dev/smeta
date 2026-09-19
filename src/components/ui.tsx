@@ -79,6 +79,7 @@ interface EditableNumberInputProps {
   min?: number;
   max?: number;
   onCommitted?: () => void;
+  onValidationChange?: (valid: boolean) => void;
   autoFocus?: boolean;
 }
 
@@ -98,6 +99,7 @@ export const EditableNumberInput = React.forwardRef<HTMLInputElement, EditableNu
       min,
       max,
       onCommitted,
+      onValidationChange,
       autoFocus = false,
     },
     forwardedRef,
@@ -135,10 +137,12 @@ export const EditableNumberInput = React.forwardRef<HTMLInputElement, EditableNu
 
       if (!Number.isFinite(numeric) || validationMessage) {
         setError(validationMessage || 'Введите корректное число');
+        onValidationChange?.(false);
         return false;
       }
 
       setError(null);
+      onValidationChange?.(true);
       focusedRef.current = false;
       onCommit(numeric);
       setDraft(formatValue(numeric));
@@ -150,6 +154,7 @@ export const EditableNumberInput = React.forwardRef<HTMLInputElement, EditableNu
       focusedRef.current = false;
       setDraft(formatValue(value));
       setError(null);
+      onValidationChange?.(true);
     };
 
     return (
@@ -163,11 +168,13 @@ export const EditableNumberInput = React.forwardRef<HTMLInputElement, EditableNu
           onFocus={(e) => {
             focusedRef.current = true;
             setError(null);
+            onValidationChange?.(false);
             requestAnimationFrame(() => e.currentTarget.select());
           }}
           onChange={(e) => {
             focusedRef.current = true;
             setError(null);
+            onValidationChange?.(false);
             setDraft(e.target.value);
           }}
           onBlur={() => {
