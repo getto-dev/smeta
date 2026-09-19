@@ -12,6 +12,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const { isInstallable, isInstalled, isIOS, install } = usePWAInstall();
   const [showIOSGuide, setShowIOSGuide] = useState(false);
 
+  React.useEffect(() => {
+    if (!isOpen) setShowIOSGuide(false);
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleInstall = async () => {
