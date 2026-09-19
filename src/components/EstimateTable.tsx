@@ -189,6 +189,7 @@ export const EstimateTable: React.FC<EstimateTableProps> = ({
                                     ariaLabel={`Цена: ${item.name}`}
                                     title="Цена за единицу"
                                     enterKeyHint="done"
+                                    autoFocus
                                     className="w-24 text-right"
                                   />
                                 ) : (
