@@ -27,7 +27,6 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({});
-  const [recentlyAddedId, setRecentlyAddedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (selectedCategory !== 'all' && !categories.includes(selectedCategory)) {
@@ -70,14 +69,9 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
   };
 
   const handleAdd = (item: CatalogItem) => {
-    if (recentlyAddedId === item.id) return;
     const qty = normalizeQuantity(getItemQuantity(item.id));
     onAddItem(item, qty);
     setItemQuantities((prev) => ({ ...prev, [item.id]: 1 }));
-    setRecentlyAddedId(item.id);
-    window.setTimeout(() => {
-      setRecentlyAddedId((prev) => (prev === item.id ? null : prev));
-    }, 1200);
   };
 
   return (
@@ -147,17 +141,14 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
             const currentQty = getItemQuantity(item.id);
             const inEstimateQty = estimateQuantities.get(item.id) || 0;
             const isMaterial = item.type === 'material';
-            const isJustAdded = recentlyAddedId === item.id;
 
             return (
               <div
                 key={item.id}
                 className={`flex flex-col gap-2.5 rounded-xl border p-3 transition sm:flex-row sm:items-center sm:justify-between ${
-                  isJustAdded
-                    ? 'border-emerald-500/80 bg-emerald-500/10'
-                    : inEstimateQty > 0
-                      ? 'border-slate-700/90 bg-slate-800/80 shadow-sm'
-                      : 'border-slate-800/80 bg-slate-950/60 hover:border-slate-700 hover:bg-slate-800/40'
+                  inEstimateQty > 0
+                    ? 'border-slate-700/90 bg-slate-800/80 shadow-sm'
+                    : 'border-slate-800/80 bg-slate-950/60 hover:border-slate-700 hover:bg-slate-800/40'
                 }`}
               >
                 <div className="min-w-0 flex-1">
@@ -220,12 +211,12 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
                       </div>
                       <Button
                         type="button"
-                        variant={isJustAdded ? 'secondary' : 'primary'}
+                        variant="primary"
                         onClick={() => handleAdd(item)}
-                        className={`shrink-0 px-3 text-xs ${isJustAdded ? 'text-emerald-300' : ''}`}
+                        className="shrink-0 px-3 text-xs"
                         title="Добавить в смету"
                       >
-                        {isJustAdded ? '✓ Добавлено' : 'В смету'}
+                        В смету
                       </Button>
                     </div>
                   </div>
