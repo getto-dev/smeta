@@ -181,7 +181,7 @@ test('mobile catalog prevents accidental duplicate add taps', async ({ page }) =
   const addButton = page.getByRole('button', { name: 'В смету' }).first();
   await expect(addButton).toBeVisible();
   await addButton.click();
-  await expect(page.getByRole('button', { name: 'Добавлено' }).first()).toBeDisabled();
+  await expect(page.getByRole('button', { name: /Добавлено/ }).first()).toBeDisabled();
 });
 
 test('catalog search and category filter preserve a usable mobile flow', async ({ page }) => {
