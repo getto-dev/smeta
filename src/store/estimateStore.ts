@@ -295,3 +295,6 @@ export const useEstimateStore = create<EstimateStore>((set, get) => ({
     }
   },
 }));
+
+export type { EstimateTotals } from '../domain/estimate/calculations';
+export { calculateEstimateTotals } from '../domain/estimate/calculations';
