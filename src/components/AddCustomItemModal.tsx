@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, PlusCircle, Check } from 'lucide-react';
+import { PlusCircle, Check } from 'lucide-react';
 import { EstimateItem } from '../types';
 import { Button, FieldLabel, Modal, TextArea, TextInput } from './ui';
 
