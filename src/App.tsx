@@ -77,7 +77,7 @@ export default function App() {
     <div className="flex min-h-screen flex-col bg-slate-950 font-sans text-slate-100 selection:bg-amber-500 selection:text-slate-950 lg:h-screen lg:overflow-hidden">
       <Header currentProfile={currentProfile} onOpenProfileSelector={() => setIsProfileModalOpen(true)} onOpenSettings={() => setIsSettingsModalOpen(true)} />
 
-      <div className="mobile-screen-inset sticky top-0 z-30 flex-shrink-0 border-b border-slate-800 bg-slate-900 p-2 no-print lg:hidden">
+      <div className="mobile-tabs-sticky sticky top-0 z-30 flex-shrink-0 border-b border-slate-800 bg-slate-900 p-2 no-print lg:hidden">
         <div className="grid grid-cols-2 gap-1.5 rounded-xl border border-slate-800 bg-slate-950 p-1">
           <button
             type="button"
