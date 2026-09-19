@@ -79,6 +79,7 @@ interface EditableNumberInputProps {
   min?: number;
   max?: number;
   onCommitted?: () => void;
+  autoFocus?: boolean;
 }
 
 export const EditableNumberInput = React.forwardRef<HTMLInputElement, EditableNumberInputProps>(
@@ -97,6 +98,7 @@ export const EditableNumberInput = React.forwardRef<HTMLInputElement, EditableNu
       min,
       max,
       onCommitted,
+      autoFocus = false,
     },
     forwardedRef,
   ) => {
@@ -113,6 +115,14 @@ export const EditableNumberInput = React.forwardRef<HTMLInputElement, EditableNu
         setError(null);
       }
     }, [value, formatValue]);
+
+    useEffect(() => {
+      if (!autoFocus) return;
+      requestAnimationFrame(() => {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      });
+    }, [autoFocus]);
 
     const commit = () => {
       const parsed = parseValue(draft.trim());
