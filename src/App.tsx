@@ -57,7 +57,6 @@ export default function App() {
   const handleAddCustomItem = (itemData: Omit<EstimateItem, 'id' | 'total'>) => {
     addItem(itemData, itemData.quantity);
     setIsCustomItemModalOpen(false);
-    setMobileTab('estimate');
   };
 
   const handleRestoreEstimate = async (restored: Estimate) => {
@@ -120,7 +119,6 @@ export default function App() {
                 activeEstimateItems={estimate.items}
                 onAddItem={(item: CatalogItem, qty: number) => {
                   addItem(item, qty);
-                  setMobileTab('estimate');
                 }}
                 synonyms={currentCatalog?.synonyms}
                 onOpenCustomModal={() => setIsCustomItemModalOpen(true)}
