@@ -322,7 +322,7 @@ export const Modal: React.FC<ModalProps> = ({
         aria-describedby={describedBy}
         onMouseDown={(event) => event.stopPropagation()}
         onTouchEnd={(event) => event.stopPropagation()}
-        className={`w-full rounded-t-2xl bg-slate-900 border border-slate-800 shadow-2xl text-slate-100 max-h-[100dvh] overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)] sm:rounded-2xl sm:max-h-[90vh] sm:pb-0 ${className}`}
+        className={`mobile-modal-scroll w-full rounded-t-2xl bg-slate-900 border border-slate-800 shadow-2xl text-slate-100 max-h-[100dvh] overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)] sm:rounded-2xl sm:max-h-[90vh] sm:pb-0 ${className}`}
       >
         {children}
       </div>
