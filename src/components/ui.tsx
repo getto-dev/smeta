@@ -249,7 +249,7 @@ export const Modal: React.FC<ModalProps> = ({
         return;
       }
       if (event.key !== 'Tab' || !rootRef.current) return;
-      const focusables = Array.from(
+      const focusables: HTMLElement[] = Array.from(
         rootRef.current.querySelectorAll<HTMLElement>(
           'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
         ),
