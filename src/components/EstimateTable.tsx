@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Trash2, Edit3, Check, ShoppingBag, Wrench, Package, ChevronDown, ChevronRight, RotateCcw } from 'lucide-react';
+import { Trash2, Edit3, ShoppingBag, Wrench, Package, ChevronDown, ChevronRight, RotateCcw } from 'lucide-react';
 import { EstimateItem } from '../types';
 import { formatCurrency } from '../services/exportService';
 import { formatQuantity, changeQuantity } from '../utils/quantity';
