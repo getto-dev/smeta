@@ -69,6 +69,21 @@ body {
   }
 }
 
+@media (max-width: 1023px) {
+  input, textarea, select, button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input, textarea, select {
+    scroll-margin-top: 5rem;
+    scroll-margin-bottom: 8rem;
+  }
+
+  .mobile-modal-scroll {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
 @media (max-height: 500px) and (orientation: landscape) {
   .landscape-compact {
     padding-top: 0.5rem !important;
