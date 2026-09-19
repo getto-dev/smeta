@@ -157,3 +157,42 @@ test('escape closes mobile dialogs', async ({ page }) => {
   await page.keyboard.press('Escape');
   await expect(page.getByRole('heading', { name: 'Настройки' })).toBeHidden();
 });
+
+test('mobile numeric input rejects invalid step and recovers without corrupting the value', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('button', { name: 'В смету' }).first().click();
+  const mobileEstimateTab = page.getByRole('button', { name: /^Смета \(1\)$/ });
+  if (await mobileEstimateTab.isVisible().catch(() => false)) await mobileEstimateTab.click();
+
+  const quantity = page.getByTestId('estimate-table').locator('input[title^="Количество"]:visible').first();
+  await quantity.fill('1.25');
+  await quantity.blur();
+  await expect(quantity).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.getByText('Шаг: 0.5', { exact: true })).toBeVisible();
+
+  await quantity.fill('2.5');
+  await quantity.press('Enter');
+  await expect(quantity).toHaveValue('2.5');
+  await expect(quantity).toHaveAttribute('aria-invalid', 'false');
+});
+
+test('mobile catalog prevents accidental duplicate add taps', async ({ page }) => {
+  await page.goto('./');
+  const addButton = page.getByRole('button', { name: 'В смету' }).first();
+  await expect(addButton).toBeVisible();
+  await addButton.click();
+  await expect(page.getByRole('button', { name: /Добавлено/ }).first()).toBeDisabled();
+});
+
+test('catalog search and category filter preserve a usable mobile flow', async ({ page }) => {
+  await page.goto('./');
+  const search = page.locator('#catalog-search-input');
+  await search.fill('труба');
+  await expect(search).toHaveValue('труба');
+  await page.getByRole('button', { name: 'Выбрать раздел каталога' }).click();
+  await expect(page.getByRole('heading', { name: 'Выберите раздел' })).toBeVisible();
+  await page.getByRole('button', { name: /Все разделы/ }).click();
+  await expect(search).toHaveValue('труба');
+});
+
+

@@ -43,8 +43,13 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
     return map;
   }, [activeEstimateItems]);
 
-  const filteredItems = useMemo(() => {
-    return searchCatalogItems(
+  const categoryCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const item of catalogItems) counts.set(item.category, (counts.get(item.category) || 0) + 1);
+    return counts;
+  }, [catalogItems]);
+
+  const filteredItems = useMemo(() => {    return searchCatalogItems(
       catalogItems,
       searchQuery,
       selectedCategory === 'all' ? undefined : selectedCategory,
@@ -65,6 +70,7 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
   };
 
   const handleAdd = (item: CatalogItem) => {
+    if (recentlyAddedId === item.id) return;
     const qty = normalizeQuantity(getItemQuantity(item.id));
     onAddItem(item, qty);
     setItemQuantities((prev) => ({ ...prev, [item.id]: 1 }));
@@ -269,7 +275,7 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
           </button>
 
           {categories.map((category) => {
-            const count = catalogItems.filter((item) => item.category === category).length;
+            const count = categoryCounts.get(category) || 0;
             const isSelected = selectedCategory === category;
             return (
               <button
