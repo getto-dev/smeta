@@ -173,7 +173,7 @@ export const EstimateTable: React.FC<EstimateTableProps> = ({
                                   ariaLabel={`Количество: ${item.name}`}
                                   title="Количество, шаг 0.5"
                                   enterKeyHint="done"
-                                  className="w-14 border-0 bg-transparent px-1 text-center sm:w-10"
+                                  className="w-16 border-0 bg-transparent px-1 text-center sm:w-16"
                                 />
                                 <button
                                   type="button"
