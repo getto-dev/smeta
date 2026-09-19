@@ -74,23 +74,36 @@ export const EstimateTable: React.FC<EstimateTableProps> = ({
 
   if (items.length === 0) {
     return (
-      <div className="landscape-no-min-height flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-2xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
-        <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-700/80 bg-slate-800/80 text-slate-500">
-          <ShoppingBag className="h-7 w-7" />
+      <div data-testid="estimate-table" className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div className="landscape-no-min-height flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-2xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
+          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-700/80 bg-slate-800/80 text-slate-500">
+            <ShoppingBag className="h-7 w-7" />
+          </div>
+          <h3 className="mb-1 text-base font-bold text-white">Смета пока пуста</h3>
+          <p className="mb-4 max-w-sm text-xs text-slate-400">Нажмите «В смету» в каталоге слева или добавьте нестандартную позицию вручную.</p>
+          {onSwitchToCatalog && (
+            <Button type="button" onClick={onSwitchToCatalog} className="lg:hidden">
+              Открыть каталог позиций
+            </Button>
+          )}
         </div>
-        <h3 className="mb-1 text-base font-bold text-white">Смета пока пуста</h3>
-        <p className="mb-4 max-w-sm text-xs text-slate-400">Нажмите «В смету» в каталоге слева или добавьте нестандартную позицию вручную.</p>
-        {onSwitchToCatalog && (
-          <Button type="button" onClick={onSwitchToCatalog} className="lg:hidden">
-            Открыть каталог позиций
-          </Button>
+        {deletedItem && onRestoreItem && (
+          <div className="flex flex-shrink-0 items-center justify-between gap-3 border-t border-slate-800 bg-slate-950/95 px-3 py-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] backdrop-blur-md">
+            <div className="min-w-0 text-xs text-slate-300">
+              Удалено: <span className="font-semibold text-white">{deletedItem.name}</span>
+            </div>
+            <Button type="button" variant="secondary" onClick={handleUndo} className="shrink-0 px-3 text-xs">
+              <RotateCcw className="h-4 w-4" />
+              Отменить
+            </Button>
+          </div>
         )}
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-xl">
+    <div data-testid="estimate-table" className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-xl">
       <div className="flex flex-shrink-0 items-center border-b border-slate-800 bg-slate-900/95 px-4 py-3">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-bold text-white">Позиции сметы</h3>
