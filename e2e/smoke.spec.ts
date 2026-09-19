@@ -19,7 +19,7 @@ test('catalog → estimate → quantity → discount → autosave → reload →
   if (await mobileEstimateTab.isVisible().catch(() => false)) await mobileEstimateTab.click();
 
   await expect(page.getByRole('heading', { name: 'Позиции сметы' })).toBeVisible();
-  const estimateQuantity = page.locator('input[title="Количество"]').first();
+  const estimateQuantity = page.locator('input[title^="Количество"]').first();
   await expect(estimateQuantity).toHaveValue('1');
   await estimateQuantity.fill('2.5');
   await estimateQuantity.blur();
@@ -30,7 +30,7 @@ test('catalog → estimate → quantity → discount → autosave → reload →
   await expect(page.getByText('Сохранено', { exact: true })).toBeVisible();
 
   await page.reload();
-  const reloadedEstimateQuantity = page.locator('input[title="Количество"]').first();
+  const reloadedEstimateQuantity = page.locator('input[title^="Количество"]').first();
   if (await mobileEstimateTab.isVisible().catch(() => false)) await mobileEstimateTab.click();
   await expect(page.getByRole('heading', { name: 'Позиции сметы' })).toBeVisible();
   await expect(reloadedEstimateQuantity).toHaveValue('2.5');
@@ -85,7 +85,7 @@ test('mobile editing keeps values on blur and supports full item edit and undo',
   const mobileEstimateTab = page.getByRole('button', { name: /^Смета \(1\)$/ });
   if (await mobileEstimateTab.isVisible().catch(() => false)) await mobileEstimateTab.click();
 
-  const quantity = page.locator('input[title="Количество"]').first();
+  const quantity = page.locator('input[title^="Количество"]').first();
   await quantity.fill('2.5');
   await quantity.blur();
   await expect(quantity).toHaveValue('2.5');
