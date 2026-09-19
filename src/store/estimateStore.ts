@@ -5,7 +5,7 @@ import { createEmptyEstimate, normalizeEstimateItem, recalculateEstimate } from 
 import { calculateEstimateTotals } from '../domain/estimate/calculations';
 import type { EstimateTotals } from '../domain/estimate/calculations';
 import { normalizeQuantity } from '../utils/quantity';
-import { isValidEstimate, MAX_ESTIMATE_ITEMS } from '../utils/validation';
+import { isValidEstimate, MAX_ESTIMATE_ITEMS, MAX_NAME_LENGTH, MAX_CATEGORY_LENGTH, MAX_UNIT_LENGTH, MAX_DESCRIPTION_LENGTH } from '../utils/validation';
 
 export type SaveStatus = 'saved' | 'saving' | 'error';
 
@@ -18,7 +18,12 @@ type EstimateStore = {
   addItem: (item: CatalogItem | Omit<EstimateItem, 'id' | 'total'>, quantity?: number) => void;
   updateItemQuantity: (id: string, quantity: number) => void;
   updateItemPrice: (id: string, priceKopecks: number) => void;
+  updateItem: (
+    id: string,
+    patch: Pick<EstimateItem, 'name' | 'description' | 'category' | 'categoryId' | 'unit' | 'price' | 'quantity' | 'type'>,
+  ) => void;
   deleteItem: (id: string) => void;
+  restoreItem: (item: EstimateItem) => void;
   clearEstimate: () => void;
   updateDiscount: (discount: number) => void;
   createNewEstimate: (profileId?: string, profileName?: string) => Promise<void>;
@@ -114,11 +119,11 @@ export const useEstimateStore = create<EstimateStore>((set, get) => ({
 
   addItem: (item, quantity = 1) => {
     const safeQuantity = normalizeQuantity(quantity);
-    const safeName = String(item.name || '').trim().slice(0, 300) || 'Позиция без названия';
-    const safeCategory = String(item.category || '').trim().slice(0, 200) || 'Общие работы';
+    const safeName = String(item.name || '').trim().slice(0, MAX_NAME_LENGTH) || 'Позиция без названия';
+    const safeCategory = String(item.category || '').trim().slice(0, MAX_CATEGORY_LENGTH) || 'Общие работы';
     const safeCategoryId = String(item.categoryId || '').trim().slice(0, 128) || 'manual';
-    const safeUnit = String(item.unit || '').trim().slice(0, 50) || 'шт';
-    const safeDescription = item.description ? String(item.description).slice(0, 1000) : undefined;
+    const safeUnit = String(item.unit || '').trim().slice(0, MAX_UNIT_LENGTH) || 'шт';
+    const safeDescription = item.description ? String(item.description).slice(0, MAX_DESCRIPTION_LENGTH) : undefined;
     const safePrice = Number.isFinite(Number(item.price)) && Number(item.price) >= 0 ? Math.round(Number(item.price)) : 0;
 
     set((state) => {
@@ -147,10 +152,11 @@ export const useEstimateStore = create<EstimateStore>((set, get) => ({
 
   updateItemQuantity: (id, quantity) => {
     set((state) => {
-      const safeQuantity = Number.isFinite(quantity) ? normalizeQuantity(quantity) : 1;
       const items = quantity <= 0
         ? state.estimate.items.filter((item) => item.id !== id)
-        : state.estimate.items.map((item) => item.id === id ? normalizeEstimateItem({ ...item, quantity: safeQuantity }) : item);
+        : state.estimate.items.map((item) => item.id === id
+          ? normalizeEstimateItem({ ...item, quantity: Number.isFinite(quantity) ? normalizeQuantity(quantity) : item.quantity })
+          : item);
       const updated = rebuild(state.estimate, items);
       const totals = calculateEstimateTotals(updated.items, updated.discount);
       persistEstimate(updated, (status) => set({ saveStatus: status }));
@@ -161,7 +167,42 @@ export const useEstimateStore = create<EstimateStore>((set, get) => ({
   updateItemPrice: (id, priceKopecks) => {
     if (!Number.isFinite(priceKopecks) || priceKopecks < 0) return;
     set((state) => {
-      const items = state.estimate.items.map((item) => item.id === id ? normalizeEstimateItem({ ...item, price: priceKopecks }) : item);
+      const items = state.estimate.items.map((item) => item.id === id ? normalizeEstimateItem({ ...item, price: Math.round(priceKopecks) }) : item);
+      const updated = rebuild(state.estimate, items);
+      const totals = calculateEstimateTotals(updated.items, updated.discount);
+      persistEstimate(updated, (status) => set({ saveStatus: status }));
+      return { estimate: updated, totals };
+    });
+  },
+
+  updateItem: (id, patch) => {
+    set((state) => {
+      const items = state.estimate.items.map((item) => {
+        if (item.id !== id) return item;
+        const safeName = String(patch.name || '').trim().slice(0, MAX_NAME_LENGTH) || item.name;
+        const safeCategory = String(patch.category || '').trim().slice(0, MAX_CATEGORY_LENGTH) || item.category;
+        const safeCategoryId = String(patch.categoryId || '').trim().slice(0, 128) || item.categoryId;
+        const safeUnit = String(patch.unit || '').trim().slice(0, MAX_UNIT_LENGTH) || item.unit;
+        const rawDescription = patch.description ? String(patch.description).slice(0, MAX_DESCRIPTION_LENGTH) : undefined;
+        const safePrice = Number.isFinite(Number(patch.price)) && Number(patch.price) >= 0 ? Math.round(Number(patch.price)) : item.price;
+        const safeQuantity = Number.isFinite(Number(patch.quantity)) && Number(patch.quantity) > 0
+          ? normalizeQuantity(Number(patch.quantity))
+          : item.quantity;
+        const safeType = patch.type === 'material' ? 'material' : 'work';
+
+        return normalizeEstimateItem({
+          ...item,
+          ...patch,
+          name: safeName,
+          category: safeCategory,
+          categoryId: safeCategoryId,
+          unit: safeUnit,
+          description: rawDescription,
+          price: safePrice,
+          quantity: safeQuantity,
+          type: safeType,
+        });
+      });
       const updated = rebuild(state.estimate, items);
       const totals = calculateEstimateTotals(updated.items, updated.discount);
       persistEstimate(updated, (status) => set({ saveStatus: status }));
@@ -172,6 +213,16 @@ export const useEstimateStore = create<EstimateStore>((set, get) => ({
   deleteItem: (id) => {
     set((state) => {
       const updated = rebuild(state.estimate, state.estimate.items.filter((item) => item.id !== id));
+      const totals = calculateEstimateTotals(updated.items, updated.discount);
+      persistEstimate(updated, (status) => set({ saveStatus: status }));
+      return { estimate: updated, totals };
+    });
+  },
+
+  restoreItem: (item) => {
+    set((state) => {
+      if (state.estimate.items.some((entry) => entry.id === item.id)) return state;
+      const updated = rebuild(state.estimate, [...state.estimate.items, item]);
       const totals = calculateEstimateTotals(updated.items, updated.discount);
       persistEstimate(updated, (status) => set({ saveStatus: status }));
       return { estimate: updated, totals };
@@ -244,6 +295,3 @@ export const useEstimateStore = create<EstimateStore>((set, get) => ({
     }
   },
 }));
-
-export type { EstimateTotals } from '../domain/estimate/calculations';
-export { calculateEstimateTotals } from '../domain/estimate/calculations';
