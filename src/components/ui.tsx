@@ -127,6 +127,14 @@ export const EditableNumberInput = React.forwardRef<HTMLInputElement, EditableNu
       });
     }, [autoFocus]);
 
+    const getValidationMessage = (rawDraft: string) => {
+      const parsed = parseValue(rawDraft.trim());
+      const numeric = Number.isFinite(parsed) ? parsed : NaN;
+      const rangeMessage = Number.isFinite(numeric)
+        ? ((min !== undefined && numeric < min) ? `Минимум: ${formatValue(min)}` : (max !== undefined && numeric > max) ? `Максимум: ${formatValue(max)}` : null)
+        : 'Введите число';
+      return rangeMessage || validate?.(numeric, rawDraft) || null;
+    };
     const commit = () => {
       const parsed = parseValue(draft.trim());
       const numeric = Number.isFinite(parsed) ? parsed : NaN;
@@ -168,14 +176,15 @@ export const EditableNumberInput = React.forwardRef<HTMLInputElement, EditableNu
           onFocus={(e) => {
             focusedRef.current = true;
             setError(null);
-            onValidationChange?.(false);
+            onValidationChange?.(!getValidationMessage(formatValue(value)));
             requestAnimationFrame(() => e.currentTarget.select());
           }}
           onChange={(e) => {
             focusedRef.current = true;
+            const nextDraft = e.target.value;
             setError(null);
-            onValidationChange?.(false);
-            setDraft(e.target.value);
+            onValidationChange?.(!getValidationMessage(nextDraft));
+            setDraft(nextDraft);
           }}
           onBlur={() => {
             if (skipBlurCommitRef.current) {
@@ -273,9 +282,20 @@ export const Modal: React.FC<ModalProps> = ({
       }
     };
 
+    const onFocusIn = (event: FocusEvent) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement) || !rootRef.current?.contains(target)) return;
+      if (!target.matches('input, textarea, select')) return;
+      window.setTimeout(() => {
+        target.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
+      }, 80);
+    };
+
+    document.addEventListener('focusin', onFocusIn);
     document.addEventListener('keydown', onKeyDown);
     return () => {
       document.body.style.overflow = previousOverflow;
+      document.removeEventListener('focusin', onFocusIn);
       document.removeEventListener('keydown', onKeyDown);
       restoreFocusRef.current?.focus();
     };
