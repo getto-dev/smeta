@@ -49,6 +49,7 @@ export const EstimateTable: React.FC<EstimateTableProps> = ({
   }, [items]);
 
   const handleDelete = (item: EstimateItem) => {
+    if (deleteTimerRef.current !== null) window.clearTimeout(deleteTimerRef.current);
     onDeleteItem(item.id);
     setDeletedItem(item);
     if (deleteTimerRef.current !== null) window.clearTimeout(deleteTimerRef.current);
@@ -137,7 +138,7 @@ export const EstimateTable: React.FC<EstimateTableProps> = ({
                     const isMaterial = item.type === 'material';
 
                     return (
-                      <div key={item.id} className="rounded-xl border border-slate-800/90 bg-slate-900/80 p-2.5 transition hover:border-slate-700 sm:p-3">
+                      <div key={item.id} className="mobile-estimate-card rounded-xl border border-slate-800/90 bg-slate-900/80 p-2.5 transition hover:border-slate-700 sm:p-3">
                         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                           <div className="flex min-w-0 flex-1 items-start gap-2.5">
                             <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded bg-slate-800 font-mono text-[10px] font-medium text-slate-400 sm:h-5 sm:w-5">{index}</span>
