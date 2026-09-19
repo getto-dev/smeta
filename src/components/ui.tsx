@@ -106,6 +106,7 @@ export const EditableNumberInput = React.forwardRef<HTMLInputElement, EditableNu
     const [draft, setDraft] = useState(formatValue(value));
     const [error, setError] = useState<string | null>(null);
     const focusedRef = useRef(false);
+    const skipBlurCommitRef = useRef(false);
 
     React.useImperativeHandle(forwardedRef, () => inputRef.current as HTMLInputElement);
 
@@ -170,6 +171,10 @@ export const EditableNumberInput = React.forwardRef<HTMLInputElement, EditableNu
             setDraft(e.target.value);
           }}
           onBlur={() => {
+            if (skipBlurCommitRef.current) {
+              skipBlurCommitRef.current = false;
+              return;
+            }
             if (!commit()) {
               focusedRef.current = false;
             }
@@ -177,10 +182,14 @@ export const EditableNumberInput = React.forwardRef<HTMLInputElement, EditableNu
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
-              if (commit()) e.currentTarget.blur();
+              if (commit()) {
+                skipBlurCommitRef.current = true;
+                e.currentTarget.blur();
+              }
             } else if (e.key === 'Escape') {
               e.preventDefault();
               revert();
+              skipBlurCommitRef.current = true;
               e.currentTarget.blur();
             }
           }}
