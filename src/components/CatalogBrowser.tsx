@@ -171,7 +171,7 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
                 </div>
 
                 <div className="flex flex-col gap-2 border-t border-slate-800/60 pt-2 sm:flex-row sm:items-center sm:justify-end sm:border-t-0 sm:pt-0">
-                  <div className="flex items-center justify-between gap-3 sm:justify-end">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
                     <div className="text-left sm:text-right">
                       <div className="font-mono text-xs font-bold text-amber-400 sm:text-sm">{formatCurrency(item.price)}</div>
                       <div className="text-[10px] text-slate-400">за 1 {item.unit}</div>
