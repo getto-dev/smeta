@@ -28,7 +28,10 @@ export const CustomerInfoModal: React.FC<CustomerInfoModalProps> = ({ isOpen, on
     setAddress(estimate.address || '');
     setDate(estimate.date || new Date().toISOString().split('T')[0]);
     setNotes(estimate.notes || '');
-  }, [estimate, isOpen]);
+  // Intentionally hydrate only when the modal opens; external estimate updates must not overwrite a user draft.
+  // eslint is not configured in this project, so this dependency is intentionally limited to isOpen.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
