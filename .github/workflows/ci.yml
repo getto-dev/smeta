@@ -48,4 +48,4 @@ jobs:
             echo 'Found legacy project/data-source references in build output.'
             exit 1
           fi
-          grep -q 'smeta-remote-data-v5' dist/sw.js
+          grep -q 'smeta-remote-data-v6' dist/sw.js
