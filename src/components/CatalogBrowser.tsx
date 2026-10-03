@@ -1,16 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Check, Filter, ListFilter, Package, PlusCircle, Search, Wrench, X } from 'lucide-react';
+import { Check, Filter, ListFilter, PlusCircle, Search, X } from 'lucide-react';
 import { CatalogItem, EstimateItem } from '../types';
 import { formatCurrency } from '../services/exportService';
 import { searchCatalogItems } from '../services/smartSearch';
-import { formatQuantity } from '../utils/quantity';
 import { Button, Modal } from './ui';
 import { AddCatalogItemModal } from './AddCatalogItemModal';
 
 interface CatalogBrowserProps {
   catalogItems: CatalogItem[];
   categories: string[];
-  activeEstimateItems: EstimateItem[];
   synonyms?: string[][];
   onAddItem: (item: CatalogItem, quantity: number) => void;
   onOpenCustomModal: () => void;
@@ -19,7 +17,6 @@ interface CatalogBrowserProps {
 export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
   catalogItems,
   categories,
-  activeEstimateItems,
   synonyms,
   onAddItem,
   onOpenCustomModal,
@@ -41,14 +38,6 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
     const timer = window.setTimeout(() => setToast(null), 1800);
     return () => window.clearTimeout(timer);
   }, [toast]);
-
-  const estimateQuantities = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const item of activeEstimateItems) {
-      map.set(item.catalogId || item.id, (map.get(item.catalogId || item.id) || 0) + item.quantity);
-    }
-    return map;
-  }, [activeEstimateItems]);
 
   const categoryCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -125,11 +114,7 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
           )}
         </div>
 
-        <div className="text-[11px] text-slate-500">
-          {selectedCategory === 'all'
-            ? 'Нажмите на услугу, чтобы посмотреть цену и добавить её в смету'
-            : `${filteredItems.length} поз. · Нажмите на услугу для добавления`}
-        </div>
+
       </div>
 
       <div className="mobile-scroll-safe landscape-no-min-height flex-1 min-h-0 space-y-2 overflow-y-auto p-3 pb-24 sm:space-y-2.5 sm:p-4 sm:pb-4">
@@ -143,65 +128,31 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
             </Button>
           </div>
         ) : (
-          filteredItems.map((item) => {
-            const inEstimateQty = estimateQuantities.get(item.id) || 0;
-            const isMaterial = item.type === 'material';
+          filteredItems.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setSelectedItem(item)}
+              className="group flex w-full items-center gap-3 rounded-xl border border-slate-800/80 bg-slate-950/60 p-3 text-left transition active:scale-[0.995] hover:border-slate-700 hover:bg-slate-800/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 sm:p-3.5"
+              aria-label={'Открыть ' + item.name + '. Цена ' + formatCurrency(item.price) + ' за 1 ' + item.unit}
+            >
+              <div className="min-w-0 flex-1">
+                <h3 className="text-sm font-bold leading-snug text-white sm:text-base">{item.name}</h3>
+                {item.description && (
+                  <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-slate-400 sm:text-sm">
+                    {item.description}
+                  </p>
+                )}
+              </div>
 
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setSelectedItem(item)}
-                className={`group flex w-full flex-col gap-2 rounded-xl border p-3 text-left transition active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 sm:flex-row sm:items-center sm:justify-between sm:gap-3 ${inEstimateQty > 0 ? 'border-slate-700/90 bg-slate-800/80 shadow-sm' : 'border-slate-800/80 bg-slate-950/60 hover:border-slate-700 hover:bg-slate-800/40'}`}
-                aria-label={`Добавить в смету: ${item.name}, ${formatCurrency(item.price)} за 1 ${item.unit}`}
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="mb-1 flex flex-wrap items-center gap-1.5">
-                    <span className="max-w-[180px] truncate text-[10px] font-medium text-slate-400">{item.category}</span>
-                    <span
-                      className={`inline-flex items-center gap-0.5 rounded border px-1.5 py-0.5 text-[10px] font-semibold ${isMaterial ? 'border-sky-500/30 bg-sky-500/15 text-sky-400' : 'border-amber-500/30 bg-amber-500/15 text-amber-400'}`}
-                    >
-                      {isMaterial ? (
-                        <>
-                          <Package className="h-3 w-3" />
-                          Материал
-                        </>
-                      ) : (
-                        <>
-                          <Wrench className="h-3 w-3" />
-                          Работа
-                        </>
-                      )}
-                    </span>
-                    {inEstimateQty > 0 && (
-                      <span className="flex items-center gap-0.5 rounded border border-emerald-500/40 bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-400">
-                        <Check className="h-3 w-3" />
-                        <span>
-                          в смете: {formatQuantity(inEstimateQty)} {item.unit}
-                        </span>
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-xs font-semibold leading-snug text-white sm:text-sm">{item.name}</h3>
-                  {item.description && (
-                    <p className="mt-0.5 line-clamp-1 text-[11px] text-slate-400">{item.description}</p>
-                  )}
+              <div className="w-24 shrink-0 text-right sm:w-28">
+                <div className="whitespace-nowrap font-mono text-sm font-extrabold text-amber-400 sm:text-base">
+                  {formatCurrency(item.price)}
                 </div>
-
-                <div className="flex shrink-0 items-end justify-between gap-3 border-t border-slate-800/60 pt-2 sm:min-w-32 sm:flex-col sm:items-end sm:justify-center sm:border-t-0 sm:pt-0">
-                  <div className="text-left sm:text-right">
-                    <div className="whitespace-nowrap font-mono text-sm font-black text-amber-400">
-                      {formatCurrency(item.price)}
-                    </div>
-                    <div className="text-[10px] text-slate-400">за 1 {item.unit}</div>
-                  </div>
-                  <div className="text-[10px] font-semibold text-slate-500 transition group-hover:text-amber-400">
-                    Нажать для добавления →
-                  </div>
-                </div>
-              </button>
-            );
-          })
+                <div className="text-[10px] font-semibold text-slate-400 sm:text-xs">за {item.unit}</div>
+              </div>
+            </button>
+          ))
         )}
       </div>
 
@@ -273,7 +224,7 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
       <AddCatalogItemModal
         item={selectedItem}
         isOpen={selectedItem !== null}
-        currentQuantity={selectedItem ? estimateQuantities.get(selectedItem.id) || 0 : 0}
+        currentQuantity={0}
         onClose={() => setSelectedItem(null)}
         onAddItem={handleAddFromModal}
       />
