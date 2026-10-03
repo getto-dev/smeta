@@ -52,7 +52,7 @@ export default defineConfig(() => {
               urlPattern: /^https:\/\/raw\.githubusercontent\.com\/getto-dev\/smeta\/main\/data\/.*\.json$/i,
               handler: 'NetworkFirst',
               options: {
-                cacheName: 'smeta-remote-data-v5',
+                cacheName: 'smeta-remote-data-v6',
                 networkTimeoutSeconds: 3,
                 expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
                 cacheableResponse: { statuses: [0, 200] },

@@ -997,8 +997,7 @@
       "description": "От сложности монтажа",
       "unit": "шт",
       "priceKopecks": 135000,
-      "categoryId": "sewerage",
-      "type": "service"
+      "categoryId": "sewerage",      "type": "service"
     },
     {
       "id": "sewer_023",
@@ -1074,10 +1073,19 @@
     },
     {
       "id": "sewer_031",
-      "name": "Замена стояка чугун/пластик",
+      "name": "Замена стояка чугун",
       "description": "демонтаж, монтаж",
       "unit": "шт",
-      "priceKopecks": 1170000,
+      "priceKopecks": 2000000,
+      "categoryId": "sewerage",
+      "type": "service"
+    },
+    {
+      "id": "sewer_038",
+      "name": "Замена стояка пластик",
+      "description": "демонтаж, монтаж",
+      "unit": "шт",
+      "priceKopecks": 1200000,
       "categoryId": "sewerage",
       "type": "service"
     },
@@ -1988,8 +1996,7 @@
       "unit": "шт",
       "priceKopecks": 180000,
       "categoryId": "grooving",
-      "type": "service"
-    },
+      "type": "service"    },
     {
       "id": "groove_037",
       "name": "Пробивка 100x200 пеноблок",

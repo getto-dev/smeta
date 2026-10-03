@@ -5,7 +5,7 @@
   "description": "Монтаж водопровода, канализации, отопления, санфаянса и котельного оборудования",
   "icon": "Wrench",
   "color": "sky",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "locale": "ru-RU",
   "currency": "RUB",
   "files": {
@@ -14,5 +14,5 @@
     "synonyms": "search-synonyms.json",
     "config": "config.json"
   },
-  "itemCount": 271
+  "itemCount": 272
 }
