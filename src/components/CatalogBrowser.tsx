@@ -9,6 +9,7 @@ import { AddCatalogItemModal } from './AddCatalogItemModal';
 interface CatalogBrowserProps {
   catalogItems: CatalogItem[];
   categories: string[];
+  activeEstimateItems: EstimateItem[];
   synonyms?: string[][];
   onAddItem: (item: CatalogItem, quantity: number) => void;
   onOpenCustomModal: () => void;
@@ -17,6 +18,7 @@ interface CatalogBrowserProps {
 export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
   catalogItems,
   categories,
+  activeEstimateItems,
   synonyms,
   onAddItem,
   onOpenCustomModal,
@@ -38,6 +40,14 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
     const timer = window.setTimeout(() => setToast(null), 1800);
     return () => window.clearTimeout(timer);
   }, [toast]);
+
+  const estimateQuantities = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const item of activeEstimateItems) {
+      map.set(item.catalogId || item.id, (map.get(item.catalogId || item.id) || 0) + item.quantity);
+    }
+    return map;
+  }, [activeEstimateItems]);
 
   const categoryCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -113,8 +123,6 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
             </button>
           )}
         </div>
-
-
       </div>
 
       <div className="mobile-scroll-safe landscape-no-min-height flex-1 min-h-0 space-y-2 overflow-y-auto p-3 pb-24 sm:space-y-2.5 sm:p-4 sm:pb-4">
@@ -224,7 +232,7 @@ export const CatalogBrowser: React.FC<CatalogBrowserProps> = ({
       <AddCatalogItemModal
         item={selectedItem}
         isOpen={selectedItem !== null}
-        currentQuantity={0}
+        currentQuantity={selectedItem ? estimateQuantities.get(selectedItem.id) || 0 : 0}
         onClose={() => setSelectedItem(null)}
         onAddItem={handleAddFromModal}
       />
